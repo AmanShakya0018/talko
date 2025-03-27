@@ -1,32 +1,30 @@
 import express from "express";
+import { createServer } from "http";
 import { Server } from "socket.io";
-import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-
-const server = http.createServer(app);
+const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST"]
+  }
 });
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  socket.on("joinRoom", (roomId) => {
+  socket.on("join-room", (roomId) => {
     socket.join(roomId);
     console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
-  socket.on("sendMessage", ({ roomId, message }) => {
-    io.to(roomId).emit("receiveMessage", message);
+  socket.on("send-message", ({ roomId, message }) => {
+    io.to(roomId).emit("receive-message", message);
   });
 
   socket.on("disconnect", () => {
