@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
@@ -10,7 +10,6 @@ export default function ChatWindow() {
   const router = useRouter();
   const socket = useSocket();
   const [roomId, setRoomId] = useState("");
-  const [mounted, setMounted] = useState(false);
 
   const joinRoom = () => {
     if (socket && roomId) {
@@ -18,11 +17,6 @@ export default function ChatWindow() {
       router.push(`/room/${roomId}`);
     }
   };
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) return null;
 
   return (
     <div className="flex flex-col items-center p-6">

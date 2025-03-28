@@ -17,17 +17,21 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("join-room", ({ roomId, userName }) => {
-    socket.join(roomId);
-    console.log(`${userName} joined room: ${roomId}`);
-
-    socket.to(roomId).emit("user-joined", userName);
+  socket.on("join-room", ({ roomId, user }) => {
+    if (roomId && user) {
+      socket.join(roomId);
+      console.log(`${user} joined room: ${roomId}`);
+      io.to(roomId).emit("user-joined", `${user} has joined the room.`);
+    } else {
+      console.log("Room ID or User is undefined");
+    }
   });
 
-  socket.on("send-message", ({ roomId, message, userName }) => {
-    console.log(`Message from ${userName} in room ${roomId}: ${message}`);
-    io.to(roomId).emit("receive-message", `${userName}: ${message}`);
+  socket.on("send-message", ({ roomId, message, user }) => {
+    io.to(roomId).emit("receive-message", { message, user });
   });
+  
+  
 
   socket.on("disconnect", () => {
     console.log("A user disconnected");

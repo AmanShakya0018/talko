@@ -1,18 +1,16 @@
-"use client"
-import ChatWindow from "@/components/chatwindow";
 import Navbar from "@/components/Navbar";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function Home() {
-
-  const { data: session } = useSession();
   return (
     <>
       <Navbar />
-      <div className="text-4xl">
-        <div>hi {session?.user.name}</div>
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Welcome to the Chat App!</h1>
+        <Link href="/users" className="text-blue-500 underline">
+          View All Users
+        </Link>
       </div>
-      <ChatWindow />
     </>
   );
 }
