@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import axios from "axios";
 dotenv.config();
 
 const app = express();
@@ -11,33 +11,60 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
-io.on("connection", (socket) => {
-  console.log("A user connected");
 
-  socket.on("join-room", ({ roomId, user }) => {
-    if (roomId && user) {
+app.use(cors());
+app.use(express.json());
+
+io.on("connection", (socket) => {
+  const { userId, username } = socket.handshake.query;
+
+  if (userId && username) {
+    console.log(`User connected: ${username} (ID: ${userId})`);
+  } else {
+    console.log("User connected without ID or username");
+    return;
+  }
+
+  socket.on("join-room", ({ roomId }) => {
+    if (roomId && userId && username) {
       socket.join(roomId);
-      console.log(`${user} joined room: ${roomId}`);
-      io.to(roomId).emit("user-joined", `${user} has joined the room.`);
+      console.log(`${username} joined room: ${roomId} (ID: ${userId})`);
+      io.to(roomId).emit("user-joined", `${username} has joined the room.`);
     } else {
-      console.log("Room ID or User is undefined");
+      console.log("Room ID, User ID, or Username is missing");
     }
   });
 
-  socket.on("send-message", ({ roomId, message, user }) => {
-    io.to(roomId).emit("receive-message", { message, user });
+  socket.on("send-message", async ({ message, receiverId }) => {
+    try {
+      if (message && userId && receiverId) {
+        await axios.post(`${process.env.CLIENT_URL}/api/messages`, {
+          content: message,
+          senderId: userId,
+          receiverId,
+        });
+  
+        io.to(receiverId).emit("receive-message", {
+          senderId: userId,
+          message,
+        });
+        console.log(`Message sent from ${username} to ${receiverId}: ${message}`);
+      } else {
+        console.log("Message, User ID, or Receiver ID is missing");
+      }
+    } catch (err) {
+      console.error("Error sending message:", err);
+    }
   });
   
-  
-
   socket.on("disconnect", () => {
-    console.log("A user disconnected");
+    console.log(`Disconnected: ${socket.id}`);
   });
 });
 
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`server is running on post ${PORT}`));

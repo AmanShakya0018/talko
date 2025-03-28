@@ -1,19 +1,35 @@
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
-
-const SERVER_URL = "http://localhost:5000";
+import { useSession } from "next-auth/react";
 
 export const useSocket = () => {
+  const { data: session } = useSession();
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io(SERVER_URL);
-    setSocket(newSocket);
+    if (session?.user) {
+      const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL!, {
+        query: {
+          userId: session.user.id,
+          username: session.user.name,
+        },
+      });
 
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
+      setSocket(newSocket);
+
+      newSocket.on("connect", () => {
+        console.log(`✅ Connected to socket server: ${newSocket.id}`);
+      });
+
+      newSocket.on("disconnect", () => {
+        console.log(`Disconnected from socket server`);
+      });
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [session?.user]);
 
   return socket;
 };

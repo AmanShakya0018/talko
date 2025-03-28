@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
 import { useSession } from "next-auth/react";
+import axios from "axios";
 
 export default function ChatRoom() {
   const { roomId } = useParams();
@@ -12,28 +13,42 @@ export default function ChatRoom() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(`/api/messages?receiverId=${roomId}`);
+        const data = res.data;
+        setMessages(data.map((msg: { senderId: string; content: string }) => `${msg.senderId}: ${msg.content}`));
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Error fetching messages:", error.message);
+        } else {
+          console.error("Error fetching messages:", error);
+        }
+      }
+    };
+
+    fetchMessages();
+  }, [roomId]);
 
   useEffect(() => {
     if (socket && roomId) {
-      socket.emit("join-room", { roomId, user: session?.user.name });
+      socket.emit("join-room", { roomId });
 
+      socket?.on("receive-message", ({ senderId, message }) => {
+        setMessages((prev) => [...prev, `${senderId === session?.user.id ? "You" : "Friend"}: ${message}`]);
+      });
+
+      return () => {
+        socket.off("receive-message");
+      };
     }
+  }, [socket, roomId, session?.user.id]);
 
-    socket?.on("receive-message", ({ message, user }) => {
-      const displayName = user === session?.user.name ? "You" : user;
-      setMessages((prev) => [...prev, `${displayName}: ${message}`]);
-    });
-
-    return () => {
-      socket?.off("receive-message");
-    };
-  }, [socket, roomId, session?.user.name]);
-
-  const sendMessage = () => {
-    if (socket && roomId && message) {
-      socket.emit("send-message", { roomId, message, user: session?.user.name });
-      setMessage("");
-    }
+  const sendMessage = async () => {
+    if (!message.trim()) return;
+    socket?.emit("send-message", { message, receiverId: roomId });
+    setMessage("");
   };
 
   return (
