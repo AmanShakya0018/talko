@@ -2,6 +2,8 @@
 import React, { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "./theme-provider";
+import ReceiverProvider from "@/context/ReceiverContext";
+import ReceiverImageProvider from "@/context/ReceiverImageContext";
 
 type Props = {
   children: ReactNode
@@ -10,14 +12,18 @@ type Props = {
 const Provider = ({ children }: Props) => {
   return (
     <SessionProvider>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-      </ThemeProvider>
+      <ReceiverImageProvider>
+        <ReceiverProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ReceiverProvider>
+      </ReceiverImageProvider>
     </SessionProvider>
   );
 };

@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 
 import Image from "next/image";
+import useReceiver from "@/hooks/useReceiver";
+import useReceiverImage from "@/hooks/useReceiverImage";
 
 interface User {
   id: string;
@@ -16,6 +18,8 @@ interface User {
 export default function UserDirectory() {
   const [users, setUsers] = useState<User[]>([]);
   const { data: session } = useSession();
+  const { setReceiver } = useReceiver();
+  const { setReceiverImage } = useReceiverImage();
   const router = useRouter();
 
   useEffect(() => {
@@ -32,10 +36,12 @@ export default function UserDirectory() {
   }, []);
 
 
-  const handleChat = (selectedUserId: string) => {
+  const handleChat = (selectedUserId: string, selectedUserName: string, selectedUserImage: string) => {
     const currentUserId = session?.user?.id;
     if (!currentUserId) return;
     const roomId = [currentUserId, selectedUserId].sort().join("-");
+    setReceiver(selectedUserName);
+    setReceiverImage(selectedUserImage);
     router.push(`/room/${roomId}`);
   };
 
@@ -49,14 +55,16 @@ export default function UserDirectory() {
               width={500}
               height={500}
               priority
-              quality={95}
+              quality={99}
               src={user.image || "/pfp.png"}
               alt={user.name}
-              className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
             />
             <span>{user.name}</span>
             <button
-              onClick={() => handleChat(user.id)}
+              onClick={() => {
+                handleChat(user.id, user.name, user.image)
+              }}
               className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
             >
               Chat

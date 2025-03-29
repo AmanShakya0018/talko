@@ -4,11 +4,16 @@ import { useParams } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import useReceiver from "@/hooks/useReceiver";
+import Image from "next/image";
+import useReceiverImage from "@/hooks/useReceiverImage";
 
 export default function ChatRoom() {
   const { roomId } = useParams();
   const socket = useSocket();
   const { data: session } = useSession();
+  const { receiver } = useReceiver();
+  const { receiverImage } = useReceiverImage();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
 
@@ -35,7 +40,7 @@ export default function ChatRoom() {
       socket.emit("join-room", { roomId });
 
       socket.on("receive-message", ({ senderName, message }) => {
-        const displayName = senderName === session?.user.name ? "You" : senderName;
+        const displayName = senderName === session?.user.name ? session?.user.name || "You" : senderName;
         setMessages((prev) => [...prev, `${displayName}: ${message}`]);
       });
 
@@ -59,7 +64,16 @@ export default function ChatRoom() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Chat Room: {roomId}</h1>
+      <div className="text-2xl flex items-center gap-2 font-bold mb-4">
+        <Image
+          width={500}
+          height={500}
+          priority
+          quality={99}
+          src={receiverImage || "/pfp.png"}
+          alt={"pfp"}
+          className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+        /> {receiver ? receiver : "Friend"}</div>
       <div className="border p-4 h-64 overflow-auto mb-4">
         {messages.map((msg, idx) => (
           <p key={idx} className="mb-2">{msg}</p>
