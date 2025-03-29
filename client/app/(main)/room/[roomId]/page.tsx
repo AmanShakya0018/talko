@@ -7,6 +7,7 @@ import axios from "axios";
 import useReceiver from "@/hooks/useReceiver";
 import Image from "next/image";
 import useReceiverImage from "@/hooks/useReceiverImage";
+import { Loader2 } from "lucide-react";
 
 export default function ChatRoom() {
   const { roomId } = useParams();
@@ -14,6 +15,7 @@ export default function ChatRoom() {
   const { data: session } = useSession();
   const { receiver } = useReceiver();
   const { receiverImage } = useReceiverImage();
+  const [hasMounted, setHasMounted] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<string[]>([]);
 
@@ -61,6 +63,14 @@ export default function ChatRoom() {
 
     setMessage("");
   };
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return <div className="w-full h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin" /></div >;
+  }
 
   return (
     <div className="p-4">
