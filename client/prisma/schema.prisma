@@ -26,7 +26,8 @@ model Message {
   id         String   @id @default(uuid())
   content    String
   senderId   String
-  receiverId String
+  senderName String
+  roomId     String
   createdAt  DateTime @default(now())
 }
 

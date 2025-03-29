@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
@@ -16,9 +15,9 @@ export default function ChatRoom() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`/api/messages?receiverId=${roomId}`);
-        const data = res.data;
-        setMessages(data.map((msg: { senderId: string; content: string }) => `${msg.senderId}: ${msg.content}`));
+        const response = await axios.get(`/api/messages?roomId=${roomId}`);
+        const data = response.data;
+        setMessages(data.map((msg: { senderName: string; content: string }) => `${msg.senderName}: ${msg.content}`));
       } catch (error) {
         if (error instanceof Error) {
           console.error("Error fetching messages:", error.message);
@@ -35,19 +34,26 @@ export default function ChatRoom() {
     if (socket && roomId) {
       socket.emit("join-room", { roomId });
 
-      socket?.on("receive-message", ({ senderId, message }) => {
-        setMessages((prev) => [...prev, `${senderId === session?.user.id ? "You" : "Friend"}: ${message}`]);
+      socket.on("receive-message", ({ senderName, message }) => {
+        const displayName = senderName === session?.user.name ? "You" : senderName;
+        setMessages((prev) => [...prev, `${displayName}: ${message}`]);
       });
 
       return () => {
         socket.off("receive-message");
       };
     }
-  }, [socket, roomId, session?.user.id]);
+  }, [socket, roomId, session?.user.name]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
-    socket?.emit("send-message", { message, receiverId: roomId });
+    const senderName = session?.user.name || "Anonymous";
+    socket?.emit("send-message", {
+      message,
+      senderName,
+      roomId,
+    });
+
     setMessage("");
   };
 

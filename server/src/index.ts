@@ -38,20 +38,22 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("send-message", async ({ message, receiverId }) => {
+  socket.on("send-message", async ({ message, roomId, }) => {
     try {
-      if (message && userId && receiverId) {
+      if (message && userId && roomId) {
         await axios.post(`${process.env.CLIENT_URL}/api/messages`, {
           content: message,
           senderId: userId,
-          receiverId,
+          senderName: username,
+          roomId,
         });
   
-        io.to(receiverId).emit("receive-message", {
+        io.to(roomId).emit("receive-message", {
           senderId: userId,
+          senderName: username,
           message,
         });
-        console.log(`Message sent from ${username} to ${receiverId}: ${message}`);
+        console.log(`Message sent from ${username} to ${roomId}: ${message}`);
       } else {
         console.log("Message, User ID, or Receiver ID is missing");
       }
