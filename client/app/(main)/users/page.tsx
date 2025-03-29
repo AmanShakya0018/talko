@@ -49,28 +49,28 @@ export default function UserDirectory() {
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">User Directory</h1>
       <ul>
-        {users.map((user) => (
-          <li key={user.id} className="flex items-center gap-2 mb-2">
-            <Image
-              width={500}
-              height={500}
-              priority
-              quality={99}
-              src={user.image || "/pfp.png"}
-              alt={user.name}
-              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-            />
-            <span>{user.name}</span>
-            <button
-              onClick={() => {
-                handleChat(user.id, user.name, user.image)
-              }}
-              className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-            >
-              Chat
-            </button>
-          </li>
-        ))}
+        {users
+          .filter((user) => user.id !== session?.user?.id)
+          .map((user) => (
+            <li key={user.id} className="flex items-center gap-2 mb-2">
+              <Image
+                width={500}
+                height={500}
+                priority
+                quality={99}
+                src={user.image || "/pfp.png"}
+                alt={user.name}
+                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+              />
+              <span>{user.name}</span>
+              <button
+                onClick={() => handleChat(user.id, user.name, user.image)}
+                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
+              >
+                Chat
+              </button>
+            </li>
+          ))}
       </ul>
     </div>
   );

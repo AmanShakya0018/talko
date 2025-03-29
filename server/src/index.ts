@@ -17,11 +17,14 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.json());
+const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
   const { userId, username } = socket.handshake.query;
 
   if (userId && username) {
+    onlineUsers.set(userId, { username, socketId: socket.id });
+    io.emit("online-users", Array.from(onlineUsers.values()));
     console.log(`User connected: ${username} (ID: ${userId})`);
   } else {
     console.log("User connected without ID or username");
@@ -63,6 +66,13 @@ io.on("connection", (socket) => {
   });
   
   socket.on("disconnect", () => {
+    onlineUsers.forEach((user, key) => {
+      if (user.socketId === socket.id) {
+        onlineUsers.delete(key);
+      }
+    });
+
+    io.emit("online-users", Array.from(onlineUsers.values()));
     console.log(`Disconnected: ${socket.id}`);
   });
 });

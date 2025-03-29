@@ -20,7 +20,8 @@ export default function ChatRoom() {
   const { receiverImage } = useReceiverImage();
   const [hasMounted, setHasMounted] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [isOnline, setIsOnline] = useState(false);
+  const [messages, setMessages] = useState<{ senderName: string; content: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +29,10 @@ export default function ChatRoom() {
       try {
         const response = await axios.get(`/api/messages?roomId=${roomId}`);
         const data = response.data;
-        setMessages(data.map((msg: { senderName: string; content: string }) => `${msg.senderName}: ${msg.content}`));
+        setMessages(data.map((msg: { senderName: string; content: string }) => ({
+          senderName: msg.senderName,
+          content: msg.content,
+        })));
       } catch (error) {
         if (error instanceof Error) {
           console.error("Error fetching messages:", error.message);
@@ -47,14 +51,20 @@ export default function ChatRoom() {
 
       socket.on("receive-message", ({ senderName, message }) => {
         const displayName = senderName === session?.user.name ? session?.user.name || "You" : senderName;
-        setMessages((prev) => [...prev, `${displayName}: ${message}`]);
+        setMessages((prev) => [...prev, { senderName: displayName, content: message }]);
+      });
+
+      socket.on("online-users", (users) => {
+        const isOnline = users.some((user: { username: string; }) => user.username === receiver);
+        setIsOnline(isOnline);
       });
 
       return () => {
         socket.off("receive-message");
+        socket.off("online-users");
       };
     }
-  }, [socket, roomId, session?.user.name]);
+  }, [socket, roomId, session?.user.name, receiver]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -108,9 +118,12 @@ export default function ChatRoom() {
           </div>
           <div className="ml-3">
             <h2 className="text-xl font-semibold">{receiver}</h2>
-            <div className="flex items-center text-sm text-green-500">
-              <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-              Online
+            <div className={`flex items-center text-sm ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
+              <span
+                className={`h-2 w-2 rounded-full mr-2 ${isOnline ? "bg-green-500" : "bg-neutral-400"
+                  }`}
+              ></span>
+              {isOnline ? "Online" : "Offline"}
             </div>
           </div>
         </div>
@@ -119,11 +132,22 @@ export default function ChatRoom() {
       {/* Messages */}
       <ScrollArea className="flex-1">
         <div className="space-y-4 py-2">
-          {messages.map((msg, idx) => (
-            <div key={idx} className="flex justify-start w-full px-4">
-              <div className="inline-block py-2 px-4 rounded-lg bg-primary/10 text-sm max-w-[95%] sm:max-w-[90%] md:max-w-[80%] break-words">{msg}</div>
-            </div>
-          ))}
+          {messages.map((msg, idx) => {
+            const isSender = msg.senderName === session?.user.name;
+            return (
+              <div
+                key={idx}
+                className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}
+              >
+                <div
+                  className={`inline-block py-2 px-4 rounded-lg text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white" : "bg-primary/10 text-black dark:text-white"
+                    }`}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
