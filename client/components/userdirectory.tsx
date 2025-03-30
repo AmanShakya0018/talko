@@ -8,6 +8,9 @@ import axios from "axios";
 import Image from "next/image";
 import useReceiver from "@/hooks/useReceiver";
 import useReceiverImage from "@/hooks/useReceiverImage";
+import Link from "next/link";
+import UserAccountNav from "./UserAccountNav";
+import SignInButton from "./SignInButoon";
 
 interface User {
   id: string;
@@ -46,200 +49,48 @@ export default function UserDirectory() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">User Directory</h1>
-      <ul>
+    <div className="mt-4 ml-2">
+      <div className="flex flex-row items-center mb-4 justify-between">
+        <Link href={"/"}>
+          <h1 className="text-2xl font-bold ml-4">Chats</h1>
+        </Link>
+        {session?.user ? (
+          <UserAccountNav user={session.user} />
+        ) : (
+          <SignInButton text={"Sign In"} />
+        )}
+      </div>
+      <div className="space-y-1">
         {users
           .filter((user) => user.id !== session?.user?.id)
           .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
+            <button
+              onClick={() => handleChat(user.id, user.name, user.image)}
+              key={user.id}
+              className="flex items-center w-full pl-2 py-3 rounded-md hover:bg-neutral-800 transition-colors"
+            >
+              <div className="relative mr-3">
+                <Image
+                  width={500}
+                  height={500}
+                  priority
+                  quality={99}
+                  src={user.image || "/pfp.png"}
+                  alt={user.name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </div>
+
+              <div className="flex-1 text-start">
+                <div className="flex justify-between">
+                  <h2 className="text-[1.1rem] font-medium truncate">{user.name}</h2>
+
+                </div>
+                <p className="text-xs text-gray-400 truncate">Start a conversation</p>
+              </div>
+            </button>
           ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
-      <ul>
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <li key={user.id} className="flex items-center gap-2 mb-2">
-              <Image
-                width={500}
-                height={500}
-                priority
-                quality={99}
-                src={user.image || "/pfp.png"}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-              />
-              <span>{user.name}</span>
-              <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
-                className="ml-auto bg-blue-500 text-white px-2 py-1 rounded"
-              >
-                Chat
-              </button>
-            </li>
-          ))}
-      </ul>
+      </div>
     </div>
   );
 }

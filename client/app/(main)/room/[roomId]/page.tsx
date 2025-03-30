@@ -10,10 +10,21 @@ import useReceiverImage from "@/hooks/useReceiverImage"
 import { Loader2, MoreVertical, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area"
-import { Themetoggle } from "@/components/ThemeToggle"
 import { CustomInput } from "@/components/ui/custom-input"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
+import UserDirectory from "@/components/userdirectory"
+import Link from "next/link"
 
 export default function ChatRoom() {
   const { roomId } = useParams()
@@ -164,97 +175,127 @@ export default function ChatRoom() {
   }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-neutral-950">
-      {/* Header */}
-      <div className="p-4 border-b border-neutral-900 flex items-center justify-between bg-neutral-950 shadow-sm">
-        <div className="flex items-center">
-          <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-primary/20">
-            <Image
-              fill
-              priority
-              quality={90}
-              src={receiverImage || "/pfp.png"}
-              alt="Profile picture"
-              className="object-cover"
-            />
-          </div>
-          <div className="ml-3">
-            <h2 className="text-xl text-white font-semibold">{receiver}</h2>
-            <div className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
-              <span className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}></span>
-              {isOnline ? "Online" : "Offline"}
+    <Sheet>
+      <div className="flex flex-col h-screen w-full bg-neutral-950">
+        {/* Header */}
+        <div className="p-4 border-b border-neutral-900 flex items-center justify-between bg-neutral-950 shadow-sm">
+          <div className="flex items-center">
+            <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-primary/20">
+              <Image
+                fill
+                priority
+                quality={90}
+                src={receiverImage || "/pfp.png"}
+                alt="Profile picture"
+                className="object-cover"
+              />
+            </div>
+            <div className="ml-3">
+              <h2 className="text-xl text-white font-semibold">{receiver}</h2>
+              <div className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
+                <span className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}></span>
+                {isOnline ? "Online" : "Offline"}
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-neutral-900">
+                  <MoreVertical className="h-5 w-5 text-zinc-200" />
+                  <span className="sr-only">More options</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <Link href={"/"}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Home
+                  </DropdownMenuItem>
+                </Link>
+                <SheetTrigger className="w-full md:hidden block text-start">
+                  <DropdownMenuItem className="cursor-pointer">
+                    All Users
+                  </DropdownMenuItem>
+                </SheetTrigger>
+                <Link href={"/room"}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Chats
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
+                  Clear Chat
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Themetoggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-neutral-900">
-                <MoreVertical className="h-5 w-5 text-zinc-200" />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
-                Clear Chat
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
 
-      {/* Messages */}
-      <CustomScrollArea className="flex-1 talko-pattern bg-neutral-900">
-        <div className="space-y-4 py-2">
-          {messages.map((msg, idx) => {
-            const isSender = msg.senderName === session?.user.name
-            return (
-              <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
-                <div
-                  className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-neutral-700/90 text-white rounded-tl-none"
-                    }`}
-                ><p className="mb-0.5 mr-6">
-                    {msg.content}
-                  </p>
-                  <span className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"}  ml-2 absolute bottom-0 right-2`}>{msg.createdAt}</span>
+        {/* Messages */}
+        <CustomScrollArea className="flex-1 talko-pattern bg-neutral-900">
+          <div className="space-y-4 py-2">
+            {messages.map((msg, idx) => {
+              const isSender = msg.senderName === session?.user.name
+              return (
+                <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
+                  <div
+                    className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-neutral-700/90 text-white rounded-tl-none"
+                      }`}
+                  ><p className="mb-0.5 mr-6">
+                      {msg.content}
+                    </p>
+                    <span className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"}  ml-2 absolute bottom-0 right-2`}>{msg.createdAt}</span>
+                  </div>
+                </div>
+              )
+            })}
+            {isTyping && typingUser && (
+              <div className="flex justify-start w-full px-4">
+                <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
+                  <span className="flex items-center gap-1">
+                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
+                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
+                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
+                  </span>
                 </div>
               </div>
-            )
-          })}
-          {isTyping && typingUser && (
-            <div className="flex justify-start w-full px-4">
-              <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
-                <span className="flex items-center gap-1">
-                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
-                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
-                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
-                </span>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </CustomScrollArea>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </CustomScrollArea>
 
-      {/* Input area */}
-      <div className="p-4 border-t border-neutral-900 bg-neutral-950">
-        <div className="flex items-center gap-2">
-          <CustomInput
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value)
-              handleTyping()
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="flex-1 border-neutral-900 rounded-full"
-          />
-          <Button onClick={sendMessage} size="icon" className="rounded-full bg-white">
-            <Send className="h-5 w-5 text-black" />
-          </Button>
+        {/* Input area */}
+        <div className="p-4 border-t border-neutral-900 bg-neutral-950">
+          <div className="flex items-center gap-2">
+            <CustomInput
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                handleTyping()
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message..."
+              className="flex-1 border-neutral-900 rounded-full"
+            />
+            <Button onClick={sendMessage} size="icon" className="rounded-full bg-white">
+              <Send className="h-5 w-5 text-black" />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      <SheetContent className='bg-neutral-950 text-white border-neutral-900 px-2 pr-4'>
+        <SheetHeader>
+          <SheetTitle></SheetTitle>
+          <SheetDescription>
+          </SheetDescription>
+        </SheetHeader>
+        <CustomScrollArea className='h-full'>
+          <UserDirectory />
+        </CustomScrollArea>
+        <SheetFooter>
+          <SheetClose asChild>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
