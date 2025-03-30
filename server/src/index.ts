@@ -74,6 +74,11 @@ io.on("connection", (socket) => {
       console.error("Error sending message:", err);
     }
   });
+
+  socket.on("clear-chat", ({ roomId }) => {
+    socket.to(roomId).emit("chat-cleared");
+  });
+  
   
   socket.on("disconnect", () => {
     onlineUsers.forEach((user, key) => {

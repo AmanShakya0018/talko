@@ -11,6 +11,7 @@ import { Loader2, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area"
+import { Themetoggle } from "@/components/ThemeToggle"
 
 export default function ChatRoom() {
   const { roomId } = useParams()
@@ -75,11 +76,16 @@ export default function ChatRoom() {
         setIsOnline(isOnline)
       })
 
+      socket.on("chat-cleared", () => {
+        setMessages([]);
+      });
+
       return () => {
         socket.off("receive-message")
         socket.off("online-users")
         socket.off("user-typing")
         socket.off("user-stopped-typing")
+        socket.off("chat-cleared");
       }
     }
   }, [socket, roomId, session?.user.name, receiver])
@@ -101,6 +107,17 @@ export default function ChatRoom() {
       })
     }, 1000)
   }
+
+  const clearChat = async () => {
+    try {
+      await axios.delete(`/api/messages`, { data: { roomId } });
+      socket?.emit("clear-chat", { roomId });
+      setMessages([]);
+    } catch (error) {
+      console.error("Error clearing chat:", error);
+    }
+  };
+
 
   const sendMessage = async () => {
     if (!message.trim()) return
@@ -143,8 +160,8 @@ export default function ChatRoom() {
   return (
     <div className="flex flex-col h-screen w-full bg-neutral-50 dark:bg-neutral-900">
       {/* Header */}
-      <div className="p-4 border-b bg-white dark:bg-neutral-800 shadow-sm">
-        <div className="max-w-screen mx-auto flex items-center">
+      <div className="p-4 border-b flex items-center justify-between bg-white dark:bg-neutral-800 shadow-sm">
+        <div className="flex items-center">
           <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-primary/20">
             <Image
               fill
@@ -162,6 +179,15 @@ export default function ChatRoom() {
               {isOnline ? "Online" : "Offline"}
             </div>
           </div>
+        </div>
+        <div>
+          <Themetoggle />
+          <Button
+            onClick={clearChat}
+            className="bg-red-500 text-white px-2 py-1 rounded"
+          >
+            Clear Chat
+          </Button>
         </div>
       </div>
 
@@ -199,8 +225,8 @@ export default function ChatRoom() {
       </CustomScrollArea>
 
       {/* Input area */}
-      <div className="p-4 border-t bg-white dark:bg-neutral-800">
-        <div className="max-w-screen mx-auto flex gap-2 items-center">
+      <div className="p-4 border-t bg-background">
+        <div className="flex items-center gap-2">
           <Input
             value={message}
             onChange={(e) => {
@@ -208,11 +234,11 @@ export default function ChatRoom() {
               handleTyping()
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message..."
-            className="flex-1"
+            placeholder="Type a message..."
+            className="flex-1 rounded-full"
           />
-          <Button onClick={sendMessage} className="px-4">
-            <Send size={18} className="mr-2" /> Send
+          <Button onClick={sendMessage} size="icon" className="rounded-full">
+            <Send className="h-5 w-5" />
           </Button>
         </div>
       </div>
