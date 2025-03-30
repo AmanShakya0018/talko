@@ -21,7 +21,7 @@ export default function ChatRoom() {
   const [hasMounted, setHasMounted] = useState(false)
   const [message, setMessage] = useState("")
   const [isOnline, setIsOnline] = useState(false)
-  const [messages, setMessages] = useState<{ senderName: string; content: string }[]>([])
+  const [messages, setMessages] = useState<{ senderName: string; content: string; createdAt: string }[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [isTyping, setIsTyping] = useState(false)
   const [typingUser, setTypingUser] = useState<string | null>(null)
@@ -33,9 +33,10 @@ export default function ChatRoom() {
         const response = await axios.get(`/api/messages?roomId=${roomId}`)
         const data = response.data
         setMessages(
-          data.map((msg: { senderName: string; content: string }) => ({
+          data.map((msg: { senderName: string; content: string, createdAt: Date }) => ({
             senderName: msg.senderName,
             content: msg.content,
+            createdAt: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
           })),
         )
       } catch (error) {
@@ -54,9 +55,9 @@ export default function ChatRoom() {
     if (socket && roomId) {
       socket.emit("join-room", { roomId })
 
-      socket.on("receive-message", ({ senderName, message }) => {
+      socket.on("receive-message", ({ senderName, message, createdAt }) => {
         const displayName = senderName === session?.user.name ? session?.user.name || "You" : senderName
-        setMessages((prev) => [...prev, { senderName: displayName, content: message }])
+        setMessages((prev) => [...prev, { senderName: displayName, content: message, createdAt }])
       })
 
       socket.on("user-typing", ({ senderName }) => {
@@ -172,17 +173,19 @@ export default function ChatRoom() {
             return (
               <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
                 <div
-                  className={`inline-block py-2 px-4 rounded-2xl text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-primary/10 text-black dark:text-white rounded-tl-none"
+                  className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-primary/10 text-black dark:text-white rounded-tl-none"
                     }`}
-                >
-                  {msg.content}
+                ><p className="mb-0.5 mr-6">
+                    {msg.content}
+                  </p>
+                  <span className="text-[0.6rem] opacity-70 ml-2 absolute bottom-0 right-2">{msg.createdAt}</span>
                 </div>
               </div>
             )
           })}
           {isTyping && typingUser && (
             <div className="flex justify-start w-full px-4">
-              <div className="flex items-center h-8 py-2 px-4 rounded-2xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
+              <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
                 <span className="flex items-center gap-1">
                   <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
                   <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>

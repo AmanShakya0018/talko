@@ -58,11 +58,13 @@ io.on("connection", (socket) => {
           senderName: username,
           roomId,
         });
-  
+        const createdAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
         io.to(roomId).emit("receive-message", {
           senderId: userId,
           senderName: username,
           message,
+          createdAt,
         });
         console.log(`Message sent from ${username} to ${roomId}: ${message}`);
       } else {
