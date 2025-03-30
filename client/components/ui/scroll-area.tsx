@@ -1,99 +1,48 @@
 "use client"
 
-import { forwardRef, type HTMLAttributes } from "react"
+import * as React from "react"
+import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+
 import { cn } from "@/lib/utils"
 
-interface CustomScrollAreaProps extends HTMLAttributes<HTMLDivElement> {
-  viewportClassName?: string
-  orientation?: "vertical" | "horizontal" | "both"
-  scrollbarSize?: number
-  scrollbarThumbClassName?: string
-  scrollbarTrackClassName?: string
-}
+const ScrollArea = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
+>(({ className, children, ...props }, ref) => (
+  <ScrollAreaPrimitive.Root
+    ref={ref}
+    className={cn("relative overflow-hidden", className)}
+    {...props}
+  >
+    <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
+      {children}
+    </ScrollAreaPrimitive.Viewport>
+    <ScrollBar />
+    <ScrollAreaPrimitive.Corner />
+  </ScrollAreaPrimitive.Root>
+))
+ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName
 
-const ScrollArea = forwardRef<HTMLDivElement, CustomScrollAreaProps>(
-  (
-    {
-      children,
-      className,
-      viewportClassName,
-      orientation = "vertical",
-      scrollbarSize = 10,
-      ...props
-    },
-    ref,
-  ) => {
-    const scrollbarStyles = {
-      vertical: {
-        overflowY: "auto",
-        overflowX: "hidden",
-        scrollbarWidth: "thin",
-      },
-      horizontal: {
-        overflowX: "auto",
-        overflowY: "hidden",
-        scrollbarWidth: "thin",
-      },
-      both: {
-        overflow: "auto",
-        scrollbarWidth: "thin",
-      },
-    }
+const ScrollBar = React.forwardRef<
+  React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
+>(({ className, orientation = "vertical", ...props }, ref) => (
+  <ScrollAreaPrimitive.ScrollAreaScrollbar
+    ref={ref}
+    orientation={orientation}
+    className={cn(
+      "flex touch-none select-none transition-colors",
+      orientation === "vertical" &&
+        "h-full w-2.5 border-l border-l-transparent p-[1px]",
+      orientation === "horizontal" &&
+        "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+      className
+    )}
+    {...props}
+  >
+    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
+  </ScrollAreaPrimitive.ScrollAreaScrollbar>
+))
+ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-    return (
-      <div ref={ref} className={cn("relative overflow-hidden", className)} {...props}>
-        <div
-          className={cn("h-full w-full", viewportClassName)}
-          style={{
-            ...scrollbarStyles[orientation],
-            // Custom scrollbar styling for webkit browsers
-            "--scrollbar-size": `${scrollbarSize}px`,
-          } as unknown as React.CSSProperties}
-        >
-          {children}
-        </div>
-
-        <style jsx>{`
-          div {
-            scrollbar-width: thin;
-            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-          }
-          
-          div::-webkit-scrollbar {
-            width: var(--scrollbar-size);
-            height: var(--scrollbar-size);
-          }
-          
-          div::-webkit-scrollbar-track {
-            background: var(--scrollbar-track, transparent);
-            border-radius: 9999px;
-          }
-          
-          div::-webkit-scrollbar-thumb {
-            background-color: var(--scrollbar-thumb, rgba(0, 0, 0, 0.2));
-            border-radius: 9999px;
-            border: 2px solid var(--scrollbar-track, transparent);
-          }
-          
-          div::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(0, 0, 0, 0.3);
-          }
-          
-          /* For dark mode */
-          .dark div::-webkit-scrollbar-thumb {
-            background-color: rgba(255, 255, 255, 0.2);
-          }
-          
-          .dark div::-webkit-scrollbar-thumb:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-          }
-        `}</style>
-      </div>
-    )
-  },
-)
-
-ScrollArea.displayName = "CustomScrollArea"
-
-export { ScrollArea }
-
+export { ScrollArea, ScrollBar }

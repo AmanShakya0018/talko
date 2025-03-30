@@ -10,7 +10,7 @@ import useReceiverImage from "@/hooks/useReceiverImage"
 import { Loader2, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { CustomScrollArea } from "@/components/ui/custom-scroll-area"
 
 export default function ChatRoom() {
   const { roomId } = useParams()
@@ -166,7 +166,7 @@ export default function ChatRoom() {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1">
+      <CustomScrollArea className="flex-1">
         <div className="space-y-4 py-2">
           {messages.map((msg, idx) => {
             const isSender = msg.senderName === session?.user.name
@@ -196,7 +196,7 @@ export default function ChatRoom() {
           )}
           <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </CustomScrollArea>
 
       {/* Input area */}
       <div className="p-4 border-t bg-white dark:bg-neutral-800">
