@@ -25,6 +25,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast"
 import UserDirectory from "@/components/userdirectory"
 import Link from "next/link"
+import MessagesSkeleton from "@/components/messageskeleton"
 
 export default function ChatRoom() {
   const { roomId } = useParams()
@@ -35,6 +36,7 @@ export default function ChatRoom() {
   const { receiverImage } = useReceiverImage()
   const [hasMounted, setHasMounted] = useState(false)
   const [message, setMessage] = useState("")
+  const [loading, setLoading] = useState<boolean>(true)
   const [isOnline, setIsOnline] = useState(false)
   const [messages, setMessages] = useState<{ senderName: string; content: string; createdAt: string }[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -45,6 +47,7 @@ export default function ChatRoom() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(`/api/messages?roomId=${roomId}`)
         const data = response.data
         setMessages(
@@ -60,6 +63,8 @@ export default function ChatRoom() {
         } else {
           console.error("Error fetching messages:", error)
         }
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -233,21 +238,27 @@ export default function ChatRoom() {
         {/* Messages */}
         <CustomScrollArea className="flex-1 talko-pattern bg-neutral-900">
           <div className="space-y-4 py-2">
-            {messages.map((msg, idx) => {
-              const isSender = msg.senderName === session?.user.name
-              return (
-                <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
-                  <div
-                    className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-neutral-700/90 text-white rounded-tl-none"
-                      }`}
-                  ><p className="mb-0.5 mr-6">
-                      {msg.content}
-                    </p>
-                    <span className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"}  ml-2 absolute bottom-0 right-2`}>{msg.createdAt}</span>
+            {loading ? (
+              <MessagesSkeleton />
+            ) : messages.length === 0 ? (
+              <div className="flex justify-center items-center w-full px-4 py-10">
+                <p className="text-neutral-900 bg-orange-200 px-2 py-1 rounded text-xs">No messages to show. Start a conversation!</p>
+              </div>
+            ) : (
+              messages.map((msg, idx) => {
+                const isSender = msg.senderName === session?.user.name;
+                return (
+                  <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
+                    <div
+                      className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-neutral-700/90 text-white rounded-tl-none"}`}
+                    >
+                      <p className="mb-0.5 mr-6">{msg.content}</p>
+                      <span className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"} ml-2 absolute bottom-0 right-2`}>{msg.createdAt}</span>
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                );
+              })
+            )}
             {isTyping && typingUser && (
               <div className="flex justify-start w-full px-4">
                 <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">

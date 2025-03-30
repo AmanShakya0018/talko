@@ -18,8 +18,10 @@ interface User {
   image: string;
 }
 
+
 export default function UserDirectory() {
   const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const { data: session } = useSession();
   const { setReceiver } = useReceiver();
   const { setReceiverImage } = useReceiverImage();
@@ -28,16 +30,18 @@ export default function UserDirectory() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("/api/users");
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUsers();
   }, []);
-
 
   const handleChat = (selectedUserId: string, selectedUserName: string, selectedUserImage: string) => {
     const currentUserId = session?.user?.id;
@@ -60,36 +64,59 @@ export default function UserDirectory() {
           <SignInButton text={"Sign In"} />
         )}
       </div>
-      <div className="space-y-1">
-        {users
-          .filter((user) => user.id !== session?.user?.id)
-          .map((user) => (
-            <button
-              onClick={() => handleChat(user.id, user.name, user.image)}
-              key={user.id}
-              className="flex items-center w-full pl-2 py-3 rounded-md hover:bg-neutral-800 transition-colors"
-            >
-              <div className="relative mr-3">
-                <Image
-                  width={500}
-                  height={500}
-                  priority
-                  quality={99}
-                  src={user.image || "/pfp.png"}
-                  alt={user.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-              </div>
-
-              <div className="flex-1 text-start">
-                <div className="flex justify-between">
-                  <h2 className="text-[1.1rem] font-medium truncate">{user.name}</h2>
-
-                </div>
-                <p className="text-xs text-gray-400 truncate">Start a conversation</p>
-              </div>
-            </button>
+      {loading ? (
+        <div className="space-y-2">
+          {[...Array(15)].map((_, index) => (
+            <UserSkeleton key={index} />
           ))}
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {users
+            .filter((user) => user.id !== session?.user?.id)
+            .map((user) => (
+              <button
+                onClick={() => handleChat(user.id, user.name, user.image)}
+                key={user.id}
+                className="flex items-center w-full pl-2 py-3 rounded-md hover:bg-neutral-800 transition-colors"
+              >
+                <div className="relative mr-3">
+                  <Image
+                    width={500}
+                    height={500}
+                    priority
+                    quality={99}
+                    src={user.image || "/pfp.png"}
+                    alt={user.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                </div>
+
+                <div className="flex-1 text-start">
+                  <div className="flex justify-between">
+                    <h2 className="text-[1.1rem] font-medium truncate">{user.name}</h2>
+                  </div>
+                  <p className="text-xs text-gray-400 truncate">Start a conversation</p>
+                </div>
+              </button>
+            ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UserSkeleton() {
+  return (
+    <div className="flex items-center w-full pl-2 py-3 rounded-md animate-pulse bg-neutral-950 transition-colors">
+      <div className="relative mr-3">
+        <div className="w-12 h-12 rounded-full bg-neutral-800" />
+      </div>
+      <div className="flex-1 text-start">
+        <div className="flex justify-between">
+          <div className="h-4 bg-neutral-800 rounded w-1/4" />
+        </div>
+        <div className="h-3 bg-neutral-800 rounded w-2/4 mt-1" />
       </div>
     </div>
   );
