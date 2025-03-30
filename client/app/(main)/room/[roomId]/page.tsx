@@ -1,83 +1,117 @@
-"use client";
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
-import { useSocket } from "@/hooks/useSocket";
-import { useSession } from "next-auth/react";
-import axios from "axios";
-import useReceiver from "@/hooks/useReceiver";
-import Image from "next/image";
-import useReceiverImage from "@/hooks/useReceiverImage";
-import { Loader2, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+"use client"
+import { useState, useEffect, useRef } from "react"
+import { useParams } from "next/navigation"
+import { useSocket } from "@/hooks/useSocket"
+import { useSession } from "next-auth/react"
+import axios from "axios"
+import useReceiver from "@/hooks/useReceiver"
+import Image from "next/image"
+import useReceiverImage from "@/hooks/useReceiverImage"
+import { Loader2, Send } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function ChatRoom() {
-  const { roomId } = useParams();
-  const socket = useSocket();
-  const { data: session } = useSession();
-  const { receiver } = useReceiver();
-  const { receiverImage } = useReceiverImage();
-  const [hasMounted, setHasMounted] = useState(false);
-  const [message, setMessage] = useState("");
-  const [isOnline, setIsOnline] = useState(false);
-  const [messages, setMessages] = useState<{ senderName: string; content: string }[]>([]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { roomId } = useParams()
+  const socket = useSocket()
+  const { data: session } = useSession()
+  const { receiver } = useReceiver()
+  const { receiverImage } = useReceiverImage()
+  const [hasMounted, setHasMounted] = useState(false)
+  const [message, setMessage] = useState("")
+  const [isOnline, setIsOnline] = useState(false)
+  const [messages, setMessages] = useState<{ senderName: string; content: string }[]>([])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isTyping, setIsTyping] = useState(false)
+  const [typingUser, setTypingUser] = useState<string | null>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get(`/api/messages?roomId=${roomId}`);
-        const data = response.data;
-        setMessages(data.map((msg: { senderName: string; content: string }) => ({
-          senderName: msg.senderName,
-          content: msg.content,
-        })));
+        const response = await axios.get(`/api/messages?roomId=${roomId}`)
+        const data = response.data
+        setMessages(
+          data.map((msg: { senderName: string; content: string }) => ({
+            senderName: msg.senderName,
+            content: msg.content,
+          })),
+        )
       } catch (error) {
         if (error instanceof Error) {
-          console.error("Error fetching messages:", error.message);
+          console.error("Error fetching messages:", error.message)
         } else {
-          console.error("Error fetching messages:", error);
+          console.error("Error fetching messages:", error)
         }
       }
-    };
+    }
 
-    fetchMessages();
-  }, [roomId]);
+    fetchMessages()
+  }, [roomId])
 
   useEffect(() => {
     if (socket && roomId) {
-      socket.emit("join-room", { roomId });
+      socket.emit("join-room", { roomId })
 
       socket.on("receive-message", ({ senderName, message }) => {
-        const displayName = senderName === session?.user.name ? session?.user.name || "You" : senderName;
-        setMessages((prev) => [...prev, { senderName: displayName, content: message }]);
-      });
+        const displayName = senderName === session?.user.name ? session?.user.name || "You" : senderName
+        setMessages((prev) => [...prev, { senderName: displayName, content: message }])
+      })
+
+      socket.on("user-typing", ({ senderName }) => {
+        setTypingUser(senderName)
+        setIsTyping(true)
+      })
+
+      socket.on("user-stopped-typing", () => {
+        setTypingUser(null)
+        setIsTyping(false)
+      })
 
       socket.on("online-users", (users) => {
-        const isOnline = users.some((user: { username: string; }) => user.username === receiver);
-        setIsOnline(isOnline);
-      });
+        const isOnline = users.some((user: { username: string }) => user.username === receiver)
+        setIsOnline(isOnline)
+      })
 
       return () => {
-        socket.off("receive-message");
-        socket.off("online-users");
-      };
+        socket.off("receive-message")
+        socket.off("online-users")
+        socket.off("user-typing")
+        socket.off("user-stopped-typing")
+      }
     }
-  }, [socket, roomId, session?.user.name, receiver]);
+  }, [socket, roomId, session?.user.name, receiver])
+
+  const handleTyping = () => {
+    socket?.emit("typing", {
+      roomId,
+      senderName: session?.user?.name,
+    })
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket?.emit("stop-typing", {
+        roomId,
+        senderName: session?.user?.name,
+      })
+    }, 1000)
+  }
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
-    const senderName = session?.user.name || "Anonymous";
+    if (!message.trim()) return
+    const senderName = session?.user.name || "Anonymous"
     socket?.emit("send-message", {
       message,
       senderName,
       roomId,
-    });
+    })
 
-    setMessage("");
-  };
-
+    setMessage("")
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -85,20 +119,24 @@ export default function ChatRoom() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, isTyping])
 
-  const handleKeyDown = (e: { key: string; }) => {
+  const handleKeyDown = (e: { key: string }) => {
     if (e.key === "Enter") {
       sendMessage()
     }
   }
 
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
+    setHasMounted(true)
+  }, [])
 
   if (!hasMounted) {
-    return <div className="w-full h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin" /></div >;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </div>
+    )
   }
 
   return (
@@ -119,10 +157,7 @@ export default function ChatRoom() {
           <div className="ml-3">
             <h2 className="text-xl font-semibold">{receiver}</h2>
             <div className={`flex items-center text-sm ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
-              <span
-                className={`h-2 w-2 rounded-full mr-2 ${isOnline ? "bg-green-500" : "bg-neutral-400"
-                  }`}
-              ></span>
+              <span className={`h-2 w-2 rounded-full mr-2 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}></span>
               {isOnline ? "Online" : "Offline"}
             </div>
           </div>
@@ -133,21 +168,29 @@ export default function ChatRoom() {
       <ScrollArea className="flex-1">
         <div className="space-y-4 py-2">
           {messages.map((msg, idx) => {
-            const isSender = msg.senderName === session?.user.name;
+            const isSender = msg.senderName === session?.user.name
             return (
-              <div
-                key={idx}
-                className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}
-              >
+              <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
                 <div
-                  className={`inline-block py-2 px-4 rounded-lg text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white" : "bg-primary/10 text-black dark:text-white"
+                  className={`inline-block py-2 px-4 rounded-2xl text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender ? "bg-green-500 text-white rounded-tr-none" : "bg-primary/10 text-black dark:text-white rounded-tl-none"
                     }`}
                 >
                   {msg.content}
                 </div>
               </div>
-            );
+            )
           })}
+          {isTyping && typingUser && (
+            <div className="flex justify-start w-full px-4">
+              <div className="flex items-center h-8 py-2 px-4 rounded-2xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
+                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
+                  <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
+                </span>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
@@ -157,7 +200,10 @@ export default function ChatRoom() {
         <div className="max-w-screen mx-auto flex gap-2 items-center">
           <Input
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value)
+              handleTyping()
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
             className="flex-1"
@@ -168,5 +214,5 @@ export default function ChatRoom() {
         </div>
       </div>
     </div>
-  );
+  )
 }

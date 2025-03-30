@@ -41,6 +41,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("typing", ({ roomId, senderName }) => {
+    socket.to(roomId).emit("user-typing", { senderName });
+  });
+
+  socket.on("stop-typing", ({ roomId, senderName }) => {
+    socket.to(roomId).emit("user-stopped-typing", { senderName });
+  });
+
   socket.on("send-message", async ({ message, roomId, }) => {
     try {
       if (message && userId && roomId) {
