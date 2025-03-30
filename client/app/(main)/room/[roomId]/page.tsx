@@ -180,8 +180,8 @@ export default function ChatRoom() {
           </div>
           <div className="ml-3">
             <h2 className="text-xl text-white font-semibold">{receiver}</h2>
-            <div className={`flex items-center text-sm ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
-              <span className={`h-2 w-2 rounded-full mr-2 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}></span>
+            <div className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
+              <span className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}></span>
               {isOnline ? "Online" : "Offline"}
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function ChatRoom() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={clearChat} className="text-red-500 cursor-pointer">
+              <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
                 Clear Chat
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -205,7 +205,7 @@ export default function ChatRoom() {
       </div>
 
       {/* Messages */}
-      <CustomScrollArea className="flex-1 talko-pattern bg-gray-500">
+      <CustomScrollArea className="flex-1 talko-pattern bg-neutral-900">
         <div className="space-y-4 py-2">
           {messages.map((msg, idx) => {
             const isSender = msg.senderName === session?.user.name
