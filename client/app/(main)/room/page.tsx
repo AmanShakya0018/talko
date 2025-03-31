@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Sheet,
   SheetClose,
@@ -8,9 +8,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import UserDirectory from '@/components/userdirectory';
-import { CustomScrollArea } from '@/components/ui/custom-scroll-area';
+} from "@/components/ui/sheet";
+import UserDirectory from "@/components/userdirectory";
+import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
 
 const EmptyStateUI = () => {
   return (
@@ -57,18 +57,16 @@ const EmptyStateUI = () => {
           </SheetTrigger>
         </div>
       </div>
-      <SheetContent className='bg-neutral-950 text-white border-neutral-900'>
+      <SheetContent className="bg-neutral-950 text-white border-neutral-900">
         <SheetHeader>
           <SheetTitle></SheetTitle>
-          <SheetDescription>
-          </SheetDescription>
+          <SheetDescription></SheetDescription>
         </SheetHeader>
-        <CustomScrollArea className='h-full'>
+        <CustomScrollArea className="h-full">
           <UserDirectory />
         </CustomScrollArea>
         <SheetFooter>
-          <SheetClose asChild>
-          </SheetClose>
+          <SheetClose asChild></SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>

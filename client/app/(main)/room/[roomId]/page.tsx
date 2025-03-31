@@ -84,7 +84,7 @@ export default function ChatRoom() {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/messages?roomId=${roomId}`);
+        const response = await axios.get(`/api/messages?roomId=${encodeURIComponent(Array.isArray(roomId) ? roomId.join("") : roomId || "")}`);
         const data = response.data;
         setMessages(
           data.map(

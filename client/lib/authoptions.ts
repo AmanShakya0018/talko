@@ -13,18 +13,6 @@ export const authOptions = {
     signIn: "/signin",
   },
   secret: process.env.NEXTAUTH_SECRET ?? "secret",
-  // cookies: {
-  //   sessionToken: {
-  //     name: "next-auth.session-token-talko",
-  //     options: {
-  //       httpOnly: true,
-  //       secure: process.env.NODE_ENV === "production",
-  //       path: "/",
-  //       sameSite: "lax",
-  //       domain: process.env.NEXTAUTH_URL || "http://localhost:3000",
-  //     },
-  //   },
-  // },  
   callbacks: {
     async signIn(params) {
       if (!params.user.email) {
