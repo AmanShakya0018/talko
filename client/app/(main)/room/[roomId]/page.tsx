@@ -1,13 +1,13 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useSocket } from "@/hooks/useSocket"
 import { useSession } from "next-auth/react"
 import axios from "axios"
 import useReceiver from "@/hooks/useReceiver"
 import Image from "next/image"
 import useReceiverImage from "@/hooks/useReceiverImage"
-import { Loader2, MoreVertical, Send } from "lucide-react"
+import { MoreVertical, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area"
 import { CustomInput } from "@/components/ui/custom-input"
@@ -26,12 +26,14 @@ import { useToast } from "@/hooks/use-toast"
 import UserDirectory from "@/components/userdirectory"
 import Link from "next/link"
 import MessagesSkeleton from "@/components/messageskeleton"
+import ChatSkeleton from "@/components/chatskeleton"
 
 export default function ChatRoom() {
+  const router = useRouter();
   const { roomId } = useParams()
   const socket = useSocket()
   const { toast } = useToast()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { receiver } = useReceiver()
   const { receiverImage } = useReceiverImage()
   const [hasMounted, setHasMounted] = useState(false)
@@ -43,6 +45,12 @@ export default function ChatRoom() {
   const [isTyping, setIsTyping] = useState(false)
   const [typingUser, setTypingUser] = useState<string | null>(null)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/signin");
+    }
+  }, [status, router]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -172,11 +180,11 @@ export default function ChatRoom() {
   }, [])
 
   if (!hasMounted) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin" />
-      </div>
-    )
+    return <ChatSkeleton />
+  }
+
+  if (!session) {
+    return <ChatSkeleton />
   }
 
   return (

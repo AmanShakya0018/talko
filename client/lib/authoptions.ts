@@ -13,6 +13,18 @@ export const authOptions = {
     signIn: "/signin",
   },
   secret: process.env.NEXTAUTH_SECRET ?? "secret",
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token-talko",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        sameSite: "lax",
+        domain: process.env.NODE_ENV === "production" ? process.env.VERCEL === "1" ? "talko-chat.vercel.app" :  "talko.amanshakya.in" : "localhost",
+      },
+    },
+  },  
   callbacks: {
     async signIn(params) {
       if (!params.user.email) {

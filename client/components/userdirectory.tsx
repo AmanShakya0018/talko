@@ -45,11 +45,15 @@ export default function UserDirectory() {
 
   const handleChat = (selectedUserId: string, selectedUserName: string, selectedUserImage: string) => {
     const currentUserId = session?.user?.id;
-    if (!currentUserId) return;
+    if (!currentUserId) router.push("/signin");
     const roomId = [currentUserId, selectedUserId].sort().join("-");
     setReceiver(selectedUserName);
     setReceiverImage(selectedUserImage);
-    router.push(`/room/${roomId}`);
+    if (!currentUserId) {
+      router.push("/signin");
+    } else {
+      router.push(`/room/${roomId}`);
+    }
   };
 
   return (
