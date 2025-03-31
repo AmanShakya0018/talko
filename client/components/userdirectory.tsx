@@ -6,8 +6,6 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 
 import Image from "next/image";
-import useReceiver from "@/hooks/useReceiver";
-import useReceiverImage from "@/hooks/useReceiverImage";
 import Link from "next/link";
 import UserAccountNav from "./UserAccountNav";
 import SignInButton from "./SignInButoon";
@@ -23,8 +21,6 @@ export default function UserDirectory() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const { data: session } = useSession();
-  const { setReceiver } = useReceiver();
-  const { setReceiverImage } = useReceiverImage();
   const router = useRouter();
 
   useEffect(() => {
@@ -43,12 +39,10 @@ export default function UserDirectory() {
     fetchUsers();
   }, []);
 
-  const handleChat = (selectedUserId: string, selectedUserName: string, selectedUserImage: string) => {
+  const handleChat = (selectedUserId: string) => {
     const currentUserId = session?.user?.id;
     if (!currentUserId) router.push("/signin");
-    const roomId = [currentUserId, selectedUserId].sort().join("-");
-    setReceiver(selectedUserName);
-    setReceiverImage(selectedUserImage);
+    const roomId = [currentUserId, selectedUserId].sort().join("$");
     if (!currentUserId) {
       router.push("/signin");
     } else {
@@ -80,7 +74,7 @@ export default function UserDirectory() {
             .filter((user) => user.id !== session?.user?.id)
             .map((user) => (
               <button
-                onClick={() => handleChat(user.id, user.name, user.image)}
+                onClick={() => handleChat(user.id)}
                 key={user.id}
                 className="flex items-center w-full pl-2 py-3 rounded-md hover:bg-neutral-800 transition-colors"
               >
