@@ -21,7 +21,7 @@ export const authOptions = {
         secure: process.env.NODE_ENV === "production",
         path: "/",
         sameSite: "lax",
-        domain: process.env.NODE_ENV === "production" ? process.env.VERCEL === "1" ? "talko-chat.vercel.app" :  "talko.amanshakya.in" : "localhost",
+        domain: process.env.NEXTAUTH_URL || "http://localhost:3000",
       },
     },
   },  
