@@ -1,4 +1,5 @@
 import FeaturesSection from './featuressection'
+import Footer from './footer'
 import HeroSection from './herosection'
 
 
@@ -7,6 +8,7 @@ const LandingPage = () => {
     <>
       <HeroSection />
       <FeaturesSection />
+      <Footer />
     </>
   )
 }

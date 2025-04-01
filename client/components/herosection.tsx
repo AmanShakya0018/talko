@@ -7,8 +7,8 @@ import ChatMessage from './chatmessage'
 import { Send } from 'lucide-react'
 
 const HeroSection = () => {
-
   const heroRef = useRef(null)
+
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center">
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[length:30px_30px]" />
@@ -47,7 +47,7 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.h1
-            className="text-5xl text-zinc-100 md:text-6xl lg:text-7xl font-bold leading-tight"
+            className="text-5xl text-zinc-900 dark:text-zinc-100 md:text-6xl lg:text-7xl font-bold leading-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
@@ -59,7 +59,7 @@ const HeroSection = () => {
           </motion.h1>
 
           <motion.p
-            className="mt-6 text-[15px] md:text-lg lg:text-xl text-zinc-300  max-w-xl"
+            className="mt-6 text-[15px] md:text-lg lg:text-xl text-zinc-700 dark:text-zinc-300  max-w-xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -78,7 +78,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white no-underline flex space-x-2 group cursor-pointer relative transition duration-200 p-px font-semibold px-4 py-2 h-14 items-center justify-center rounded-2xl text-center text-[16px] w-40 md:48 lg:w-52"
+                className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white no-underline flex space-x-2 group cursor-pointer relative transition duration-200 p-px hover:text-zinc-100 font-semibold px-4 py-2 h-14 items-center justify-center rounded-2xl text-center text-[16px] w-40 md:48 lg:w-52"
               >
                 Get Started
               </Button>
@@ -87,7 +87,7 @@ const HeroSection = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="flex h-14 items-center justify-center rounded-2xl border border-transparent bg-black text-sm text-white transition duration-200 w-40 md:48 lg:w-52 border-neutral-600 text-[16px]"
+                className="flex h-14 items-center justify-center rounded-2xl border border-transparent bg-white dark:bg-black text-sm text-black dark:text-white transition duration-200 w-40 md:48 lg:w-52 border-neutral-300 dark:border-neutral-600 text-[16px]"
               >
                 Learn More
               </Button>
@@ -104,14 +104,14 @@ const HeroSection = () => {
           >
             <div className="relative mx-auto w-full max-w-md">
               <div className="absolute inset-0 -z-10 h-full w-full bg-gradient-to-br from-green-500 to-teal-500 opacity-20 blur-2xl" />
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/20 backdrop-blur-xl shadow-2xl">
-                <div className="relative border-b border-white/10 bg-white/5 px-4 py-3 flex items-center">
+              <div className="overflow-hidden rounded-2xl border dark:border-white/10 border-black/10 bg-white/20 dark:bg-black/20 backdrop-blur-xl shadow-2xl">
+                <div className="relative border-b dark:border-white/10 border-black/10 bg-black/5 dark:bg-white/5 px-4 py-3 flex items-center">
                   <div className="absolute left-4 flex space-x-1.5">
                     <div className="h-3 w-3 rounded-full bg-red-500" />
                     <div className="h-3 w-3 rounded-full bg-yellow-500" />
                     <div className="h-3 w-3 rounded-full bg-green-500" />
                   </div>
-                  <div className="mx-auto text-sm text-zinc-400">Talko Chat</div>
+                  <div className="mx-auto text-sm text-zinc-600 dark:text-zinc-400">Talko Chat</div>
                 </div>
                 <div className="p-4 h-96 flex flex-col">
                   <div className="flex-1 space-y-4 overflow-y-auto pr-2 no-scrollbar">
@@ -138,7 +138,7 @@ const HeroSection = () => {
                     />
                   </div>
                   <div className="mt-4 flex items-center gap-2">
-                    <div className="flex-1 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-2 text-sm text-zinc-400">
+                    <div className="flex-1 rounded-full border border-zinc-300 dark:border-zinc-800 bg-zinc-200 dark:bg-zinc-900 px-4 py-2 text-sm dark:text-zinc-400 text-zinc-600">
                       Type a message...
                     </div>
                     <Button size="icon" className="rounded-full bg-green-600 hover:bg-green-700">
