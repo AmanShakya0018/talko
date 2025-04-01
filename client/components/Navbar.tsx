@@ -22,13 +22,13 @@ const Navbar = () => {
               <Image
                 width={500}
                 height={500}
-                src={"/pfp.png"}
-                alt="talko.png"
+                src={"/talko1.png"}
+                alt="talko"
                 quality={100}
                 priority={true}
-                className="w-10 h-10 mt-1 rounded-full object-cover flex-shrink-0"
+                className="w-10 h-10 rounded-xl mt-1 object-cover flex-shrink-0"
               />
-              <h3 className="text-2xl font-bold">Talko</h3>
+              <h3 className="text-2xl font-bold ml-1">Talko</h3>
             </Link>
 
           </div>

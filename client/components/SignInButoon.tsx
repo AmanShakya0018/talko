@@ -12,7 +12,7 @@ const SignInButton = ({ text }: Props) => {
   const { status } = useSession();
 
   return (
-    <Button>
+    <Button className="bg-green-500 text-white min-w-20 hover:bg-green-600">
       <Link href="/signin">
         {status === "loading" ? (
           <Loader2 className="h-2 w-2 animate-spin" />

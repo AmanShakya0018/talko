@@ -14,13 +14,13 @@ const Footer = () => {
               <Image
                 width={500}
                 height={500}
-                src={"/pfp.png"}
-                alt="pfp.png"
+                src={"/talko1.png"}
+                alt="talko"
                 quality={100}
                 priority={true}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0 mt-1"
+                className="w-8 h-8 rounded-xl object-cover flex-shrink-0 mt-1"
               />
-              <span className="text-2xl font-extrabold text-black dark:text-white ">Talko</span>
+              <h3 className="text-2xl font-extrabold text-black dark:text-white ml-1">Talko</h3>
             </Link>
           </div>
           <div className="mt-2 text-zinc-400">

@@ -125,15 +125,59 @@ const HeroSection = () => {
                       message="Looks amazing! The new UI is so much cleaner."
                       align="right"
                     />
-                    <ChatMessage sender="Sarah" message="Thanks! I'm working on the animations now." align="left" />
                     <ChatMessage
-                      sender="Alex"
-                      message="Can't wait to see it in action! When do you think it'll be ready for testing?"
+                      sender="Sarah"
+                      message="Thanks! I focused on simplifying the layout and making it more intuitive."
+                      align="left"
+                    />
+                    <ChatMessage
+                      sender="Aman"
+                      message="Great job, Sarah! Did you also update the color scheme? It feels more vibrant."
                       align="right"
                     />
                     <ChatMessage
                       sender="Sarah"
-                      message="I should have it ready by tomorrow afternoon. I'll send you all a preview link."
+                      message="Yes! I tweaked the color palette to make it feel more modern and added a subtle gradient to the header."
+                      align="left"
+                    />
+                    <ChatMessage
+                      sender="Mike"
+                      message="The animations look smoother too. Did you change the transition timing?"
+                      align="right"
+                    />
+                    <ChatMessage
+                      sender="Sarah"
+                      message="Exactly! I switched to cubic-bezier curves for a more fluid effect. Plus, I reduced the delay to keep interactions snappy."
+                      align="left"
+                    />
+                    <ChatMessage
+                      sender="Aman"
+                      message="That sounds awesome! Have you tested it on mobile yet? Just want to make sure the responsiveness holds up."
+                      align="right"
+                    />
+                    <ChatMessage
+                      sender="Sarah"
+                      message="Yep, I did a full round of mobile testing this morning. It scales well on both iOS and Android, but I’m still fine-tuning the touch targets."
+                      align="left"
+                    />
+                    <ChatMessage
+                      sender="Mike"
+                      message="Nice, I’ll run some more tests on different devices later today. Let me know if you need any help with QA."
+                      align="right"
+                    />
+                    <ChatMessage
+                      sender="Sarah"
+                      message="That would be great! I should have it ready by tomorrow afternoon. I'll send you all a preview link once it’s polished."
+                      align="left"
+                    />
+                    <ChatMessage
+                      sender="Aman"
+                      message="Sounds good! Can’t wait to see it in action. Your attention to detail is impressive as always!"
+                      align="right"
+                    />
+                    <ChatMessage
+                      sender="Sarah"
+                      message="Thanks, Aman! I appreciate the support. Looking forward to your feedback once it’s live!"
                       align="left"
                     />
                   </div>
