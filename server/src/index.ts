@@ -26,6 +26,7 @@ io.on("connection", (socket) => {
     onlineUsers.set(userId, { username, socketId: socket.id });
     io.emit("online-users", Array.from(onlineUsers.values()));
     console.log(`User connected: ${username} (ID: ${userId})`);
+    socket.emit("connected");
   } else {
     console.log("User connected without ID or username");
     return;

@@ -103,6 +103,7 @@ export default function ChatRoom() {
             })
           )
         );
+        scrollToBottom();
 
         const currentUserId = session?.user?.id;
         if (status === "loading") return;
@@ -214,21 +215,43 @@ export default function ChatRoom() {
     }
   };
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("connected", () => {
+        console.log("Socket connection established");
+      });
+
+      return () => {
+        socket.off("connected");
+      };
+    }
+  }, [socket]);
+
+
   const sendMessage = async () => {
     if (!message.trim()) return;
     const senderName = session?.user.name || "Anonymous";
-    socket?.emit("send-message", {
-      message,
-      senderName,
-      roomId,
-    });
 
-    setMessage("");
+    if (socket?.connected) {
+      socket.emit("send-message", {
+        message,
+        senderName,
+        roomId,
+      });
+      console.log("Message sent:", message);
+    } else {
+      console.log("Socket not connected. Retrying...");
+      setTimeout(() => sendMessage(), 100);
+    }
   };
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (smooth: boolean = true) => {
+    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
   };
+
+  useEffect(() => {
+    scrollToBottom(false);
+  }, [loading]);
 
   useEffect(() => {
     scrollToBottom();
