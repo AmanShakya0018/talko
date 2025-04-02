@@ -84,7 +84,11 @@ export default function ChatRoom() {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`/api/messages?roomId=${encodeURIComponent(Array.isArray(roomId) ? roomId.join("") : roomId || "")}`);
+        const response = await axios.get(
+          `/api/messages?roomId=${encodeURIComponent(
+            Array.isArray(roomId) ? roomId.join("") : roomId || ""
+          )}`
+        );
         const data = response.data;
         setMessages(
           data.map(
@@ -118,9 +122,12 @@ export default function ChatRoom() {
 
         if (!user1 || !user2) router.push("/signin");
 
-        const receiverName = currentUserId === id1 ? user2?.name ?? "Loading.." : user1?.name ?? "Loading..";
-        const receiverImage = currentUserId === id1 ? user2?.image ?? "" : user1?.image ?? "";
-
+        const receiverName =
+          currentUserId === id1
+            ? user2?.name ?? "Loading.."
+            : user1?.name ?? "Loading..";
+        const receiverImage =
+          currentUserId === id1 ? user2?.image ?? "" : user1?.image ?? "";
 
         setReceiver(receiverName);
         setReceiverImage(receiverImage);
@@ -227,7 +234,6 @@ export default function ChatRoom() {
     }
   }, [socket]);
 
-
   const sendMessage = async () => {
     if (!message.trim()) return;
     const senderName = session?.user.name || "Anonymous";
@@ -238,6 +244,7 @@ export default function ChatRoom() {
         senderName,
         roomId,
       });
+      setMessage("");
       console.log("Message sent:", message);
     } else {
       console.log("Socket not connected. Retrying...");
@@ -246,7 +253,9 @@ export default function ChatRoom() {
   };
 
   const scrollToBottom = (smooth: boolean = true) => {
-    messagesEndRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: smooth ? "smooth" : "auto",
+    });
   };
 
   useEffect(() => {
@@ -305,10 +314,16 @@ export default function ChatRoom() {
                 />
               </div>
               <div className="ml-3">
-                <h2 className="text-xl text-white font-semibold">{receiver ? receiver : "Loading.."}</h2>
-                <div className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
+                <h2 className="text-xl text-white font-semibold">
+                  {receiver ? receiver : "Loading.."}
+                </h2>
+                <div
+                  className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"
+                    }`}
+                >
                   <span
-                    className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}
+                    className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"
+                      }`}
                   ></span>
                   {isOnline ? "Online" : "Offline"}
                 </div>
@@ -318,22 +333,35 @@ export default function ChatRoom() {
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-neutral-900">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full hover:bg-neutral-900"
+                >
                   <MoreVertical className="h-5 w-5 text-zinc-200" />
                   <span className="sr-only">More options</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <Link href={"/"}>
-                  <DropdownMenuItem className="cursor-pointer">Home</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Home
+                  </DropdownMenuItem>
                 </Link>
                 <SheetTrigger className="w-full md:hidden block text-start">
-                  <DropdownMenuItem className="cursor-pointer">All Users</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    All Users
+                  </DropdownMenuItem>
                 </SheetTrigger>
                 <Link href={"/room"}>
-                  <DropdownMenuItem className="cursor-pointer">Chats</DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Chats
+                  </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
+                <DropdownMenuItem
+                  onClick={clearChat}
+                  className="text-red-500 focus:text-red-500 cursor-pointer"
+                >
                   Clear Chat
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -355,13 +383,17 @@ export default function ChatRoom() {
                 </div>
               ) : (
                 messages.map((msg, idx) => {
-                  const isSender = msg.senderName === session?.user.name
+                  const isSender = msg.senderName === session?.user.name;
                   return (
-                    <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
+                    <div
+                      key={idx}
+                      className={`flex ${isSender ? "justify-end" : "justify-start"
+                        } w-full px-4`}
+                    >
                       <div
                         className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender
-                          ? "bg-green-500 text-white rounded-tr-none"
-                          : "bg-neutral-700/90 text-white rounded-tl-none"
+                            ? "bg-green-500 text-white rounded-tr-none"
+                            : "bg-neutral-700/90 text-white rounded-tl-none"
                           }`}
                       >
                         <p className="mb-0.5 mr-6">{msg.content}</p>
@@ -373,7 +405,7 @@ export default function ChatRoom() {
                         </span>
                       </div>
                     </div>
-                  )
+                  );
                 })
               )}
               {isTyping && typingUser && (
@@ -398,14 +430,18 @@ export default function ChatRoom() {
             <CustomInput
               value={message}
               onChange={(e) => {
-                setMessage(e.target.value)
-                handleTyping()
+                setMessage(e.target.value);
+                handleTyping();
               }}
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               className="flex-1 border-neutral-900 rounded-full"
             />
-            <Button onClick={sendMessage} size="icon" className="rounded-full bg-green-500 hover:bg-green-600">
+            <Button
+              onClick={sendMessage}
+              size="icon"
+              className="rounded-full bg-green-500 hover:bg-green-600"
+            >
               <Send className="h-5 w-5 text-white" />
             </Button>
           </div>
