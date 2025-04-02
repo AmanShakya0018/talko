@@ -3,6 +3,7 @@ import FeaturesSection from './featuressection'
 import Footer from './footer'
 import HeroSection from './herosection'
 import Navbar from './Navbar'
+import TechStackSection from './techstacksection'
 
 
 const LandingPage = () => {
@@ -11,6 +12,7 @@ const LandingPage = () => {
       <Navbar />
       <HeroSection />
       <FeaturesSection />
+      <TechStackSection />
       <FAQ />
       <Footer />
     </>
