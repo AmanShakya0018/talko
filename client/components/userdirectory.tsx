@@ -51,17 +51,14 @@ export default function UserDirectory() {
   };
 
   return (
-    <div className="mt-4 ml-2">
-      <div className="flex flex-row items-center mb-4 justify-between">
+    <div className="mt-8 mx-auto max-w-2xl px-4">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
         <Link href={"/"}>
-          <h1 className="text-2xl font-bold ml-4">Chats</h1>
+          <h1 className="text-xl font-medium text-neutral-900 dark:text-white">Chats</h1>
         </Link>
-        {session?.user ? (
-          <UserAccountNav user={session.user} />
-        ) : (
-          <SignInButton text={"Sign In"} />
-        )}
+        {session?.user ? <UserAccountNav user={session.user} /> : <SignInButton text={"Sign In"} />}
       </div>
+
       {loading ? (
         <div className="space-y-2">
           {[...Array(15)].map((_, index) => (
@@ -69,32 +66,28 @@ export default function UserDirectory() {
           ))}
         </div>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-px">
           {users
             .filter((user) => user.id !== session?.user?.id)
             .map((user) => (
               <button
                 onClick={() => handleChat(user.id)}
                 key={user.id}
-                className="flex items-center w-full pl-2 py-3 rounded-md hover:bg-neutral-800 transition-colors"
+                className="flex items-center w-full px-3 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors rounded-md"
               >
-                <div className="relative mr-3">
-                  <Image
-                    width={500}
-                    height={500}
-                    priority
-                    quality={99}
-                    src={user.image || "/pfp.png"}
-                    alt={user.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                </div>
+                <Image
+                  width={500}
+                  height={500}
+                  priority
+                  quality={99}
+                  src={user.image || "/pfp.png"}
+                  alt={user.name}
+                  className="w-10 h-10 rounded-full object-cover mr-4"
+                />
 
                 <div className="flex-1 text-start">
-                  <div className="flex justify-between">
-                    <h2 className="text-[1.1rem] font-medium truncate">{user.name}</h2>
-                  </div>
-                  <p className="text-xs text-gray-400 truncate">Start a conversation</p>
+                  <h2 className="text-sm font-medium text-neutral-900 dark:text-white">{user.name}</h2>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Start a conversation</p>
                 </div>
               </button>
             ))}

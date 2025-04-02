@@ -254,9 +254,9 @@ export default function ChatRoom() {
 
   return (
     <Sheet>
-      <div className="flex flex-col h-screen w-full bg-neutral-950">
-        {/* Header */}
-        <div className="p-4 border-b border-neutral-900 flex items-center justify-between bg-neutral-950 shadow-sm">
+      <div className="flex flex-col h-screen w-full bg-neutral-950 overflow-hidden">
+        {/* Header - Fixed at top */}
+        <div className="p-4 border-b border-neutral-900 flex items-center justify-between bg-neutral-950 shadow-sm sticky top-0 z-10">
           {loading ? (
             <div className="flex items-center w-full pl-2 py-1 rounded-md animate-pulse bg-neutral-950 transition-colors">
               <div className="relative mr-3">
@@ -282,16 +282,10 @@ export default function ChatRoom() {
                 />
               </div>
               <div className="ml-3">
-                <h2 className="text-xl text-white font-semibold">
-                  {receiver ? receiver : "Loading.."}
-                </h2>
-                <div
-                  className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"
-                    }`}
-                >
+                <h2 className="text-xl text-white font-semibold">{receiver ? receiver : "Loading.."}</h2>
+                <div className={`flex items-center text-xs ${isOnline ? "text-green-500 " : "text-neutral-400"}`}>
                   <span
-                    className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"
-                      }`}
+                    className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}
                   ></span>
                   {isOnline ? "Online" : "Offline"}
                 </div>
@@ -301,35 +295,22 @@ export default function ChatRoom() {
           <div className="flex items-center gap-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full hover:bg-neutral-900"
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-neutral-900">
                   <MoreVertical className="h-5 w-5 text-zinc-200" />
                   <span className="sr-only">More options</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-40">
                 <Link href={"/"}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    Home
-                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">Home</DropdownMenuItem>
                 </Link>
                 <SheetTrigger className="w-full md:hidden block text-start">
-                  <DropdownMenuItem className="cursor-pointer">
-                    All Users
-                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">All Users</DropdownMenuItem>
                 </SheetTrigger>
                 <Link href={"/room"}>
-                  <DropdownMenuItem className="cursor-pointer">
-                    Chats
-                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">Chats</DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem
-                  onClick={clearChat}
-                  className="text-red-500 focus:text-red-500 cursor-pointer"
-                >
+                <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
                   Clear Chat
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -337,82 +318,77 @@ export default function ChatRoom() {
           </div>
         </div>
 
-        {/* Messages */}
-        <CustomScrollArea className="flex-1 talko-pattern bg-neutral-900">
-          <div className="space-y-4 py-2">
-            {loading ? (
-              <MessagesSkeleton />
-            ) : messages.length === 0 ? (
-              <div className="flex justify-center items-center w-full px-4 py-10">
-                <p className="text-neutral-900 bg-orange-200 px-2 py-1 rounded text-xs">
-                  No messages to show. Start a conversation!
-                </p>
-              </div>
-            ) : (
-              messages.map((msg, idx) => {
-                const isSender = msg.senderName === session?.user.name;
-                return (
-                  <div
-                    key={idx}
-                    className={`flex ${isSender ? "justify-end" : "justify-start"
-                      } w-full px-4`}
-                  >
-                    <div
-                      className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender
-                        ? "bg-green-500 text-white rounded-tr-none"
-                        : "bg-neutral-700/90 text-white rounded-tl-none"
-                        }`}
-                    >
-                      <p className="mb-0.5 mr-6">{msg.content}</p>
-                      <span
-                        className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"
-                          } ml-2 absolute bottom-0 right-2`}
-                      >
-                        {msg.createdAt}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            {isTyping && typingUser && (
-              <div className="flex justify-start w-full px-4">
-                <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
-                  <span className="flex items-center gap-1">
-                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
-                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
-                    <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
-                  </span>
+        {/* Messages - Scrollable area with flex-1 */}
+        <div className="flex-1 overflow-hidden relative">
+          <CustomScrollArea className="h-full talko-pattern bg-neutral-900">
+            <div className="space-y-4 py-2 pb-2">
+              {loading ? (
+                <MessagesSkeleton />
+              ) : messages.length === 0 ? (
+                <div className="flex justify-center items-center w-full px-4 py-10">
+                  <p className="text-neutral-900 bg-orange-200 px-2 py-1 rounded text-xs">
+                    No messages to show. Start a conversation!
+                  </p>
                 </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </CustomScrollArea>
+              ) : (
+                messages.map((msg, idx) => {
+                  const isSender = msg.senderName === session?.user.name
+                  return (
+                    <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
+                      <div
+                        className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender
+                          ? "bg-green-500 text-white rounded-tr-none"
+                          : "bg-neutral-700/90 text-white rounded-tl-none"
+                          }`}
+                      >
+                        <p className="mb-0.5 mr-6">{msg.content}</p>
+                        <span
+                          className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"
+                            } ml-2 absolute bottom-0 right-2`}
+                        >
+                          {msg.createdAt}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+              {isTyping && typingUser && (
+                <div className="flex justify-start w-full px-4">
+                  <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
+                    <span className="flex items-center gap-1">
+                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
+                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
+                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
+                    </span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </CustomScrollArea>
+        </div>
 
-        {/* Input area */}
-        <div className="p-4 border-t border-neutral-900 bg-neutral-950">
+        {/* Input area - Fixed at bottom */}
+        <div className="p-4 border-t border-neutral-900 bg-neutral-950 sticky bottom-0 z-10">
           <div className="flex items-center gap-2">
             <CustomInput
               value={message}
               onChange={(e) => {
-                setMessage(e.target.value);
-                handleTyping();
+                setMessage(e.target.value)
+                handleTyping()
               }}
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
               className="flex-1 border-neutral-900 rounded-full"
             />
-            <Button
-              onClick={sendMessage}
-              size="icon"
-              className="rounded-full bg-white"
-            >
-              <Send className="h-5 w-5 text-black" />
+            <Button onClick={sendMessage} size="icon" className="rounded-full bg-green-500 hover:bg-green-600">
+              <Send className="h-5 w-5 text-white" />
             </Button>
           </div>
         </div>
       </div>
+
       <SheetContent className="bg-neutral-950 text-white border-neutral-900 px-2 pr-4">
         <SheetHeader>
           <SheetTitle></SheetTitle>
