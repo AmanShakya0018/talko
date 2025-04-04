@@ -12,7 +12,7 @@ const HeroSection = () => {
   return (
     <section ref={heroRef} className="relative min-h-screen flex items-center">
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-[length:30px_30px]" />
-      <motion.div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col md:flex-row items-center">
+      <motion.div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col md:flex-row items-center overflow-x-hidden">
         <div className="flex-1 text-center md:text-left mb-12 md:mb-0">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
