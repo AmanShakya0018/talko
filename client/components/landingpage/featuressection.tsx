@@ -2,9 +2,9 @@
 import React from 'react'
 import { ArrowRight, Check, MessageSquare, Send, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { Button } from './ui/button'
-import ChatMessage from './chatmessage'
 import Link from 'next/link'
+import { Button } from '../ui/button'
+import ChatMessage from './chatmessage'
 
 const FeaturesSection = () => {
   return (

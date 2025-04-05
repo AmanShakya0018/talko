@@ -1,5 +1,5 @@
 import React from 'react';
-import TermsOfServicePage from '@/components/termsofservice';
+import TermsOfServicePage from '@/components/secondary/termsofservice';
 
 const TermsOfService = () => {
   return (

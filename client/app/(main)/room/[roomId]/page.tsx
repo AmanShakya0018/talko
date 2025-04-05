@@ -15,7 +15,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
-import UserDirectory from "@/components/userdirectory";
 import TypingBubble from "@/components/secondary/typingbubble";
 import ChatDropDownMenu from "@/components/main/chatdropdownmenu";
 import { ChatSkeleton, HeaderSkeleton, MessagesSkeleton } from "@/components/secondary/loadingskeletons";
@@ -24,6 +23,7 @@ import { ChatHeader } from "@/components/main/chatheader";
 import ChatInput from "@/components/main/chatinput";
 import MessageBubble from "@/components/main/messagebubble";
 import useRequireAuth from "@/hooks/useRequireAuth";
+import UserDirectory from "@/components/main/userdirectory";
 
 export default function ChatRoom() {
   useRequireAuth();

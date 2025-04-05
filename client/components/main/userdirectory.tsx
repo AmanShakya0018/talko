@@ -5,8 +5,9 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import UserAccountNav from "./UserAccountNav";
-import SignInButton from "./SignInButoon";
+import UserAccountNav from "../shared/UserAccountNav";
+import { UserSkeleton } from "../secondary/loadingskeletons";
+import SignInButton from "../shared/SignInButoon";
 
 interface User {
   id: string;
@@ -90,22 +91,6 @@ export default function UserDirectory() {
             ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function UserSkeleton() {
-  return (
-    <div className="flex items-center w-full pl-2 py-3 rounded-md animate-pulse bg-neutral-950 transition-colors">
-      <div className="relative mr-3">
-        <div className="w-12 h-12 rounded-full bg-neutral-800" />
-      </div>
-      <div className="flex-1 text-start">
-        <div className="flex justify-between">
-          <div className="h-4 bg-neutral-800 rounded w-1/4" />
-        </div>
-        <div className="h-3 bg-neutral-800 rounded w-2/4 mt-1" />
-      </div>
     </div>
   );
 }

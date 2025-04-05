@@ -1,5 +1,5 @@
+import UserDirectory from "@/components/main/userdirectory";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
-import UserDirectory from "@/components/userdirectory";
 
 export default function RootLayout({
   children,

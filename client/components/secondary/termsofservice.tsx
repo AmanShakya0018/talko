@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/pageheader';
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/secondary/pageheader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 

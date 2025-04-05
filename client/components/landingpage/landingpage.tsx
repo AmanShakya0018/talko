@@ -1,9 +1,9 @@
 import FAQ from './faq'
+import TechStackSection from './techstacksection'
 import FeaturesSection from './featuressection'
-import Footer from './footer'
 import HeroSection from './herosection'
 import Navbar from './Navbar'
-import TechStackSection from './techstacksection'
+import Footer from './footer'
 
 
 const LandingPage = () => {

@@ -9,9 +9,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import UserDirectory from "@/components/userdirectory";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
 import Image from "next/image";
+import UserDirectory from "@/components/main/userdirectory";
 
 const EmptyStateUI = () => {
   return (

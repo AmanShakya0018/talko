@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { Button } from "./ui/button";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
+import { Button } from "../ui/button";
 
 type Props = { text: string };
 

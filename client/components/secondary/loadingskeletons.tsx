@@ -209,3 +209,20 @@ export const ChatSkeleton = () => {
     </div>
   );
 };
+
+
+export const UserSkeleton = () => {
+  return (
+    <div className="flex items-center w-full pl-2 py-3 rounded-md animate-pulse bg-neutral-950 transition-colors">
+      <div className="relative mr-3">
+        <div className="w-12 h-12 rounded-full bg-neutral-800" />
+      </div>
+      <div className="flex-1 text-start">
+        <div className="flex justify-between">
+          <div className="h-4 bg-neutral-800 rounded w-1/4" />
+        </div>
+        <div className="h-3 bg-neutral-800 rounded w-2/4 mt-1" />
+      </div>
+    </div>
+  );
+}

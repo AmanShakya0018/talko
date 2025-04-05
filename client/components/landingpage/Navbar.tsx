@@ -3,9 +3,9 @@ import Image from 'next/image';
 import React from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Themetoggle } from './ThemeToggle';
-import SignInButton from './SignInButoon';
-import UserAccountNav from './UserAccountNav';
+import { Themetoggle } from '../shared/ThemeToggle';
+import SignInButton from '../shared/SignInButoon';
+import UserAccountNav from '../shared/UserAccountNav';
 
 
 const Navbar = () => {

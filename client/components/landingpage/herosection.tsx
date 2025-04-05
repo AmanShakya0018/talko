@@ -2,7 +2,7 @@
 import React, { useRef } from 'react'
 import { motion } from "framer-motion"
 import Link from 'next/link'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 import ChatMessage from './chatmessage'
 import { Send } from 'lucide-react'
 
