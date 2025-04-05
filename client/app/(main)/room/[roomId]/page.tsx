@@ -4,11 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useSocket } from "@/hooks/useSocket";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import Image from "next/image";
-import { MoreVertical, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
-import { CustomInput } from "@/components/ui/custom-input";
 import {
   Sheet,
   SheetClose,
@@ -17,24 +13,23 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import UserDirectory from "@/components/userdirectory";
-import Link from "next/link";
-import MessagesSkeleton from "@/components/messageskeleton";
-import ChatSkeleton from "@/components/chatskeleton";
+import TypingBubble from "@/components/secondary/typingbubble";
+import ChatDropDownMenu from "@/components/main/chatdropdownmenu";
+import { ChatSkeleton, HeaderSkeleton, MessagesSkeleton } from "@/components/secondary/loadingskeletons";
+import { NoMessagesBlock } from "@/components/messages/status";
+import { ChatHeader } from "@/components/main/chatheader";
+import ChatInput from "@/components/main/chatinput";
+import MessageBubble from "@/components/main/messagebubble";
+import useRequireAuth from "@/hooks/useRequireAuth";
 
 export default function ChatRoom() {
+  useRequireAuth();
   const router = useRouter();
-  const { roomId } = useParams();
   const socket = useSocket();
+  const { roomId } = useParams();
   const { toast } = useToast();
   const { data: session, status } = useSession();
   const [receiver, setReceiver] = useState();
@@ -43,20 +38,12 @@ export default function ChatRoom() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isOnline, setIsOnline] = useState(false);
-  const [messages, setMessages] = useState<
-    { senderName: string; content: string; createdAt: string }[]
-  >([]);
+  const [messages, setMessages] = useState<{ senderName: string; content: string; createdAt: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewportHeight, setViewportHeight] = useState("100vh")
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/signin");
-    }
-  }, [status, router]);
 
   useEffect(() => {
     const [id1, id2] = decodeURIComponent(
@@ -305,139 +292,49 @@ export default function ChatRoom() {
   return (
     <Sheet>
       <div className="flex flex-col bg-neutral-950 overflow-hidden" style={{ height: viewportHeight }}>
-        {/* Header - Fixed at top */}
         <div className="p-4 border-b border-neutral-900 flex items-center justify-between bg-neutral-950 shadow-sm z-10">
           {loading ? (
-            <div className="flex items-center w-full pl-2 py-1 rounded-md animate-pulse bg-neutral-950 transition-colors">
-              <div className="relative mr-3">
-                <div className="w-12 h-12 rounded-full bg-neutral-800" />
-              </div>
-              <div className="flex-1 text-start">
-                <div className="flex justify-between">
-                  <div className="h-4 bg-neutral-800 rounded w-24" />
-                </div>
-                <div className="h-3 bg-neutral-800 rounded w-16 mt-1" />
-              </div>
-            </div>
+            <HeaderSkeleton />
           ) : (
-            <div className="flex items-center">
-              <div className="relative h-12 w-12 rounded-full overflow-hidden border-2 border-primary/20">
-                <Image
-                  fill
-                  priority
-                  quality={99}
-                  src={receiverImage || "/pfp.png"}
-                  alt="Profile picture"
-                  className="object-cover"
-                />
-              </div>
-              <div className="ml-3">
-                <h2 className="text-xl text-white font-semibold">{receiver ? receiver : "Loading.."}</h2>
-                <div className={`flex items-center text-xs ${isOnline ? "text-green-500" : "text-neutral-400"}`}>
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full mr-1 ${isOnline ? "bg-green-500" : "bg-neutral-400"}`}
-                  ></span>
-                  {isOnline ? "Online" : "Offline"}
-                </div>
-              </div>
-            </div>
+            <ChatHeader
+              isOnline={isOnline}
+              receiverImage={receiverImage || ""}
+              receiver={receiver || ""} />
           )}
-          <div className="flex items-center gap-3">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-neutral-900">
-                  <MoreVertical className="h-5 w-5 text-zinc-200" />
-                  <span className="sr-only">More options</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <Link href={"/"}>
-                  <DropdownMenuItem className="cursor-pointer">Home</DropdownMenuItem>
-                </Link>
-                <SheetTrigger className="w-full md:hidden block text-start">
-                  <DropdownMenuItem className="cursor-pointer">All Users</DropdownMenuItem>
-                </SheetTrigger>
-                <Link href={"/room"}>
-                  <DropdownMenuItem className="cursor-pointer">Chats</DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem onClick={clearChat} className="text-red-500 focus:text-red-500 cursor-pointer">
-                  Clear Chat
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <ChatDropDownMenu clearChat={clearChat} />
         </div>
-
-        {/* Messages - Scrollable area with flex-1 */}
         <div className="flex-1 overflow-hidden relative">
           <CustomScrollArea className="h-full talko-pattern bg-neutral-900">
             <div className="space-y-4 py-2 pb-2">
               {loading ? (
                 <MessagesSkeleton />
               ) : messages.length === 0 ? (
-                <div className="flex justify-center items-center w-full px-4 py-10">
-                  <p className="text-neutral-900 bg-orange-200 px-2 py-1 rounded text-xs">
-                    No messages to show. Start a conversation!
-                  </p>
-                </div>
+                <NoMessagesBlock />
               ) : (
-                messages.map((msg, idx) => {
-                  const isSender = msg.senderName === session?.user.name
-                  return (
-                    <div key={idx} className={`flex ${isSender ? "justify-end" : "justify-start"} w-full px-4`}>
-                      <div
-                        className={`inline-block relative py-2 px-4 rounded-xl text-sm min-w-20 max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words ${isSender
-                          ? "bg-green-500 text-white rounded-tr-none"
-                          : "bg-neutral-700/90 text-white rounded-tl-none"
-                          }`}
-                      >
-                        <p className="mb-0.5 mr-6">{msg.content}</p>
-                        <span
-                          className={`text-[0.58rem] ${isSender ? "opacity-90" : "opacity-70"} ml-2 absolute bottom-0 right-2`}
-                        >
-                          {msg.createdAt}
-                        </span>
-                      </div>
-                    </div>
-                  )
-                })
+                messages.map((msg, idx) => (
+                  <MessageBubble
+                    key={idx}
+                    content={msg.content}
+                    createdAt={msg.createdAt}
+                    isSender={msg.senderName === session?.user.name}
+                  />
+                ))
               )}
               {isTyping && typingUser && (
-                <div className="flex justify-start w-full px-4">
-                  <div className="flex items-center h-8 py-2 px-4 rounded-xl rounded-tl-none text-sm max-w-[90%] sm:max-w-[85%] md:max-w-[75%] break-words bg-primary/10 text-black dark:text-white">
-                    <span className="flex items-center gap-1">
-                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse"></span>
-                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-75"></span>
-                      <span className="h-2 w-2 bg-gray-500 rounded-full animate-pulse delay-150"></span>
-                    </span>
-                  </div>
-                </div>
+                <TypingBubble />
               )}
               <div ref={messagesEndRef} />
             </div>
           </CustomScrollArea>
         </div>
-
-        {/* Input area - Fixed at bottom */}
-        <div className="p-4 border-t border-neutral-900 bg-neutral-950 z-10">
-          <div className="flex items-center gap-2">
-            <CustomInput
-              value={message}
-              onChange={(e) => {
-                setMessage(e.target.value)
-                handleTyping()
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
-              className="flex-1 border-neutral-900 rounded-full"
-            />
-            <Button onClick={sendMessage} size="icon" className="rounded-full bg-green-500 hover:bg-green-600">
-              <Send className="h-5 w-5 text-white" />
-            </Button>
-          </div>
-        </div>
+        <ChatInput
+          message={message}
+          setMessage={setMessage}
+          sendMessage={sendMessage}
+          handleTyping={handleTyping}
+          handleKeyDown={handleKeyDown}
+        />
       </div>
-
       <SheetContent className="bg-neutral-950 text-white border-neutral-900 px-2 pr-4">
         <SheetHeader>
           <SheetTitle></SheetTitle>

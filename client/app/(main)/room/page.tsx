@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import UserDirectory from "@/components/userdirectory";
 import { CustomScrollArea } from "@/components/ui/custom-scroll-area";
+import Image from "next/image";
 
 const EmptyStateUI = () => {
   return (
@@ -19,20 +20,7 @@ const EmptyStateUI = () => {
         <div className="text-center px-8 py-12 rounded-lg max-w-md">
           <div className="flex justify-center mb-8">
             <div className="bg-neutral-800 p-6 rounded-full shadow-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="w-16 h-16 text-neutral-400"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
+              <Image src={"/talko1.png"} alt={"pfp"} height={500} width={500} priority quality={99} className="w-16 h-16" />
             </div>
           </div>
           <h1 className="text-4xl font-bold mb-6">Talko</h1>

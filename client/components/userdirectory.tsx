@@ -1,10 +1,8 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-
 import Image from "next/image";
 import Link from "next/link";
 import UserAccountNav from "./UserAccountNav";
@@ -15,7 +13,6 @@ interface User {
   name: string;
   image: string;
 }
-
 
 export default function UserDirectory() {
   const [users, setUsers] = useState<User[]>([]);
@@ -52,9 +49,9 @@ export default function UserDirectory() {
 
   return (
     <div className="mt-8 mx-auto max-w-2xl px-4">
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-neutral-800">
         <Link href={"/"}>
-          <h1 className="text-xl font-medium text-neutral-900 dark:text-white">Chats</h1>
+          <h1 className="text-xl font-medium text-white">Chats</h1>
         </Link>
         {session?.user ? <UserAccountNav user={session.user} /> : <SignInButton text={"Sign In"} />}
       </div>
@@ -73,7 +70,7 @@ export default function UserDirectory() {
               <button
                 onClick={() => handleChat(user.id)}
                 key={user.id}
-                className="flex items-center w-full px-3 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors rounded-md"
+                className="flex items-center w-full px-3 py-4 hover:bg-neutral-800/40 transition-colors rounded-md"
               >
                 <Image
                   width={500}
@@ -86,8 +83,8 @@ export default function UserDirectory() {
                 />
 
                 <div className="flex-1 text-start">
-                  <h2 className="text-sm font-medium text-neutral-900 dark:text-white">{user.name}</h2>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">Start a conversation</p>
+                  <h2 className="text-sm font-medium text-white">{user.name}</h2>
+                  <p className="text-xs text-neutral-400 mt-0.5">Start a conversation</p>
                 </div>
               </button>
             ))}
