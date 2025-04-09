@@ -59,7 +59,12 @@ io.on("connection", (socket) => {
           senderName: username,
           roomId,
         });
-        const createdAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        const createdAt = new Date().toLocaleString("en-US", {
+          timeZone: "Asia/Kolkata",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
 
         io.to(roomId).emit("receive-message", {
           senderId: userId,

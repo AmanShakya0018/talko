@@ -43,7 +43,8 @@ export default function ChatRoom() {
   const [isTyping, setIsTyping] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [viewportHeight, setViewportHeight] = useState("100vh")
+  const [viewportHeight, setViewportHeight] = useState("100vh");
+  const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
     const [id1, id2] = decodeURIComponent(
@@ -230,6 +231,7 @@ export default function ChatRoom() {
   useEffect(() => {
     if (socket) {
       socket.on("connected", () => {
+        setSocketConnected(true);
         console.log("Socket connection established");
       });
 
@@ -243,19 +245,22 @@ export default function ChatRoom() {
     if (!message.trim()) return;
     const senderName = session?.user.name || "Anonymous";
 
-    if (socket?.connected) {
-      socket.emit("send-message", {
-        message,
-        senderName,
-        roomId,
-      });
-      setMessage("");
-      console.log("Message sent:", message);
-    } else {
-      console.log("Socket not connected. Retrying...");
+    if (!socketConnected) {
+      console.log("Waiting for socket to be ready...");
       setTimeout(() => sendMessage(), 100);
+      return;
     }
+
+    socket?.emit("send-message", {
+      message,
+      senderName,
+      roomId,
+    });
+
+    setMessage("");
+    console.log("Message sent:", message);
   };
+
 
   const scrollToBottom = (smooth: boolean = true) => {
     messagesEndRef.current?.scrollIntoView({
