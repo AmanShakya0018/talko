@@ -346,7 +346,7 @@ export default function ChatRoom() {
           sendMessage={sendMessage}
           handleTyping={handleTyping}
           handleKeyDown={handleKeyDown}
-          isConnected={connectionStatus === "connected"}
+        // isConnected={connectionStatus === "connected"}
         />
       </div>
       <SheetContent className="bg-neutral-950 text-white border-neutral-900 px-2 pr-4">
