@@ -7,30 +7,50 @@ export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
+    let newSocket: Socket;
+
     if (session?.user) {
-      const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL!, {
+      newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL!, {
         query: {
           userId: session.user.id,
           username: session.user.name,
         },
-        autoConnect: true,
+        autoConnect: false,
         reconnection: true,
         reconnectionAttempts: Infinity,
         reconnectionDelay: 1000,
-        transports: ['websocket']
+        transports: ["websocket"],
       });
 
-      setSocket(newSocket);
+      const tryConnect = () => {
+        if (!newSocket.connected) {
+          console.log("Attempting to connect to socket...");
+          newSocket.connect();
+        }
+      };
+
+      tryConnect();
+
+      const interval = setInterval(() => {
+        if (!newSocket.connected) {
+          tryConnect();
+        } else {
+          clearInterval(interval);
+        }
+      }, 1000);
 
       newSocket.on("connect", () => {
         console.log(`Connected to socket server: ${newSocket.id}`);
       });
 
       newSocket.on("disconnect", () => {
-        console.log(`Disconnected from socket server`);
+        console.log(`⚠️ Disconnected from socket server`);
       });
 
+      setSocket(newSocket);
+
       return () => {
+        clearInterval(interval);
         newSocket.disconnect();
       };
     }
