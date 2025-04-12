@@ -7,50 +7,28 @@ export const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (session?.user) {
+      const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL!, {
+        query: {
+          userId: session.user.id,
+          username: session.user.name,
+        },
+      });
 
-    const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL!, {
-      query: {
-        userId: session.user.id,
-        username: session.user.name,
-      },
-      autoConnect: false,
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      transports: ["websocket"],
-    });
+      setSocket(newSocket);
 
-    const pingSocketUntilConnected = (attempt = 1) => {
-      if (newSocket.connected) {
-        console.log("Socket connected:", newSocket.id);
-        return;
-      }
+      newSocket.on("connect", () => {
+        console.log(`Connected to socket server: ${newSocket.id}`);
+      });
 
-      console.log(`Socket connect attempt ${attempt}...`);
-      newSocket.connect();
+      newSocket.on("disconnect", () => {
+        console.log(`Disconnected from socket server`);
+      });
 
-      setTimeout(() => {
-        if (!newSocket.connected) {
-          pingSocketUntilConnected(attempt + 1);
-        }
-      }, 1000);
-    };
-
-    pingSocketUntilConnected();
-
-    newSocket.on("connect", () => {
-      console.log("Connected to socket server:", newSocket.id);
-    });
-
-    newSocket.on("disconnect", () => {
-      console.warn("Disconnected from socket server");
-    });
-
-    setSocket(newSocket);
-    return () => {
-      newSocket.disconnect();
-    };
+      return () => {
+        newSocket.disconnect();
+      };
+    }
   }, [session?.user]);
 
   return socket;

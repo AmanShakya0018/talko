@@ -230,22 +230,24 @@ export default function ChatRoom() {
   };
 
   useEffect(() => {
-    if (!socket) return;
+    if (socket) {
 
-    setConnectionStatus("connecting");
+      setConnectionStatus("connecting");
 
-    socket.on("connect", () => {
-      setConnectionStatus("connected");
-    });
+      socket.on("connected", () => {
+        console.log("Socket connection established");
+        setConnectionStatus("connected");
+      });
 
-    socket.on("disconnect", () => {
-      setConnectionStatus("disconnected");
-    });
+      socket.on("disconnect", () => {
+        setConnectionStatus("disconnected");
+      });
 
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-    };
+      return () => {
+        socket.off("connected");
+        socket.off("disconnect");
+      };
+    }
   }, [socket]);
 
   const sendMessage = async () => {
@@ -263,7 +265,6 @@ export default function ChatRoom() {
       senderName,
       roomId,
     });
-
     setMessage("");
     console.log("Message sent:", message);
   };
@@ -346,7 +347,7 @@ export default function ChatRoom() {
           sendMessage={sendMessage}
           handleTyping={handleTyping}
           handleKeyDown={handleKeyDown}
-        // isConnected={connectionStatus === "connected"}
+          isConnected={connectionStatus === "connected"}
         />
       </div>
       <SheetContent className="bg-neutral-950 text-white border-neutral-900 px-2 pr-4">
