@@ -13,12 +13,17 @@ export const useSocket = () => {
           userId: session.user.id,
           username: session.user.name,
         },
+        autoConnect: true,
+        reconnection: true,
+        reconnectionAttempts: Infinity,
+        reconnectionDelay: 1000,
+        transports: ['websocket']
       });
 
       setSocket(newSocket);
 
       newSocket.on("connect", () => {
-        console.log(`✅ Connected to socket server: ${newSocket.id}`);
+        console.log(`Connected to socket server: ${newSocket.id}`);
       });
 
       newSocket.on("disconnect", () => {
