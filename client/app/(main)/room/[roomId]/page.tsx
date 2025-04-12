@@ -44,7 +44,8 @@ export default function ChatRoom() {
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [viewportHeight, setViewportHeight] = useState("100vh");
-  const [socketConnected, setSocketConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("connecting");
+
 
   useEffect(() => {
     const [id1, id2] = decodeURIComponent(
@@ -229,23 +230,29 @@ export default function ChatRoom() {
   };
 
   useEffect(() => {
-    if (socket) {
-      socket.on("connected", () => {
-        setSocketConnected(true);
-        console.log("Socket connection established");
-      });
+    if (!socket) return;
 
-      return () => {
-        socket.off("connected");
-      };
-    }
+    setConnectionStatus("connecting");
+
+    socket.on("connect", () => {
+      setConnectionStatus("connected");
+    });
+
+    socket.on("disconnect", () => {
+      setConnectionStatus("disconnected");
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+    };
   }, [socket]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
     const senderName = session?.user.name || "Anonymous";
 
-    if (!socketConnected) {
+    if (connectionStatus === "connecting") {
       console.log("Waiting for socket to be ready...");
       setTimeout(() => sendMessage(), 100);
       return;
@@ -304,7 +311,8 @@ export default function ChatRoom() {
             <ChatHeader
               isOnline={isOnline}
               receiverImage={receiverImage || ""}
-              receiver={receiver || ""} />
+              receiver={receiver || ""}
+              connectionStatus={connectionStatus} />
           )}
           <ChatDropDownMenu clearChat={clearChat} />
         </div>
@@ -338,6 +346,7 @@ export default function ChatRoom() {
           sendMessage={sendMessage}
           handleTyping={handleTyping}
           handleKeyDown={handleKeyDown}
+          isConnected={connectionStatus === "connected"}
         />
       </div>
       <SheetContent className="bg-neutral-950 text-white border-neutral-900 px-2 pr-4">
