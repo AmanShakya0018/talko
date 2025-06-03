@@ -2,11 +2,12 @@
 import Link from 'next/link'
 import React from 'react'
 import Image from 'next/image'
+import { CiHeart } from 'react-icons/ci'
 
 const Footer = () => {
 
   return (
-    <div className="border-t border-neutral-100 dark:border-white/[0.1] px-8 py-20 bg-white dark:bg-black">
+    <div className="border-t border-neutral-100 dark:border-white/[0.1] px-8 py-20">
       <div className="max-w-7xl mx-auto text-sm px-4 text-gray-400 flex sm:flex-row flex-col justify-between items-start ">
         <div>
           <div className="mb-2 flex">
@@ -20,12 +21,8 @@ const Footer = () => {
                 priority={true}
                 className="w-8 h-8 rounded-xl object-cover flex-shrink-0 mt-1"
               />
-              <h3 className="text-2xl font-extrabold text-black dark:text-white ml-1">Talko</h3>
+              <h3 className="text-[1.2rem] font-extrabold text-black dark:text-white ml-1">Talko</h3>
             </Link>
-          </div>
-          <div className="mt-2 text-zinc-400">
-            Build by
-            <a className="dark:text-emerald-500 pl-1 font-medium text-neutral-600" target="__blank" href="https://www.amanshakya.in">@AmanShakya</a>
           </div>
           <div className="mt-2 mr-2 max-w-fit">
             <Link href="https://x.com/compose/tweet?text=%F0%9F%93%A2%20Started%20a%20chat%20on%20%23Talko!%20Join%20the%20conversation%20and%20connect%20with%20friends%20%F0%9F%92%AC%20%40amanshakya0018" target='_blank'>
@@ -76,6 +73,17 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      <p className="w-full mt-12 -mb-6 text-center text-sm text-muted-foreground">
+        Made with <CiHeart className="inline-block text-foreground align-middle w-5 h-5 pb-0.5" /> by{' '}
+        <a
+          href="https://amanshakya.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline text-zinc-500"
+        >
+          this guy
+        </a>
+      </p>
     </div>
   )
 }
